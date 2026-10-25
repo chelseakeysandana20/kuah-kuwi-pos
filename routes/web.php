@@ -29,6 +29,7 @@ Route::middleware('auth')->group(function () {
     // Grup Khusus Kasir
     Route::middleware('role:kasir')->prefix('kasir')->group(function () {
         Route::get('/pos', [PosController::class, 'index'])->name('kasir.pos');
+        Route::post('/pos/checkout', [PosController::class, 'checkout'])->name('kasir.checkout');
     });
 
     // Grup Khusus Staff Dapur
