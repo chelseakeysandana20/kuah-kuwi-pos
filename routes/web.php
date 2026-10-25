@@ -2,6 +2,7 @@
 
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\PosController;
 
 // Route Publik (Bisa diakses tanpa login)
 Route::get('/', function () {
@@ -27,9 +28,7 @@ Route::middleware('auth')->group(function () {
 
     // Grup Khusus Kasir
     Route::middleware('role:kasir')->prefix('kasir')->group(function () {
-        Route::get('/pos', function () {
-            return 'Halaman Modul Perkasiran / POS';
-        })->name('kasir.pos');
+        Route::get('/pos', [PosController::class, 'index'])->name('kasir.pos');
     });
 
     // Grup Khusus Staff Dapur
