@@ -22,21 +22,23 @@ class AuthController extends Controller
         if (Auth::attempt($credentials)) {
             $request->session()->regenerate();
             
-            // Redirect ke halaman dashboard sementara setelah login sukses
-            return redirect()->intended('/dashboard'); 
+            // Redirect paksa berdasarkan role pengguna
+            $role = Auth::user()->role;
+            if ($role === 'owner') {
+                return redirect('/owner/dashboard');
+            } elseif ($role === 'kasir') {
+                return redirect('/kasir/pos');
+            } elseif ($role === 'staff_dapur') {
+                return redirect('/dapur/stok');
+            }
+            
+            // Jika role tidak dikenali
+            Auth::logout();
+            return redirect('/login')->withErrors(['username' => 'Role tidak valid.']);
         }
 
         return back()->withErrors([
             'username' => 'Username atau password yang Anda masukkan salah.',
         ])->onlyInput('username');
-    }
-
-    public function logout(Request $request)
-    {
-        Auth::logout();
-        $request->session()->invalidate();
-        $request->session()->regenerateToken();
-        
-        return redirect('/login');
     }
 }
