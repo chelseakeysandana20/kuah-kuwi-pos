@@ -3,11 +3,17 @@
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\PosController;
+use Illuminate\Support\Facades\Auth;
 
 // Route Publik (Bisa diakses tanpa login)
 Route::get('/', function () {
-    return view('landing');
-})->name('landing');
+    // Jika kasir sudah login, langsung lempar ke halaman POS
+    if (Auth::check()) {
+        return redirect()->route('kasir.pos'); // Sesuaikan dengan nama rute pos milikmu
+    }
+    // Jika belum login, barulah tampilkan splash screen
+    return view('kasir.landing');
+});
 
 // Route Guest (Hanya bisa diakses jika BELUM login)
 Route::middleware('guest')->group(function () {

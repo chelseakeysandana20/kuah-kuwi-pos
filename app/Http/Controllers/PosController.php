@@ -48,6 +48,7 @@ class PosController extends Controller
                 'user_id' => auth()->id(),
                 'receipt_number' => 'KK-' . strtoupper(Str::random(6)), // Contoh: KK-A1B2C3
                 'total_amount' => $totalAmount,
+                'note' => $request->note,
             ]);
 
             // 2. Simpan ke tabel transaction_details

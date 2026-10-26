@@ -106,6 +106,13 @@
                         </div>
                     </div>
 
+                    <!-- Kotak Tambah Catatan (Sisipkan di sini) -->
+                    <div class="mt-3 mb-3">
+                        <textarea id="order_note" rows="2" 
+                            class="w-full text-xs text-gray-700 border border-gray-300 rounded-md shadow-sm focus:ring-red-500 focus:border-red-500 p-2" 
+                            placeholder="Tambah catatan pesanan (opsional)..."></textarea>
+                    </div>
+
                     <!-- Total & Aksi Pembayaran -->
                     <div class="border-t border-dashed pt-4 mt-auto">
                         <div class="flex justify-between text-sm text-gray-500 mb-2">
@@ -216,19 +223,23 @@
             totalEl.innerText = formatRupiah(subtotal);
         }
         function processPayment() {
-            if (cart.length === 0) {
-                alert('Keranjang masih kosong! Silakan pilih menu terlebih dahulu.');
-                return;
-            }
+                if (cart.length === 0) {
+                    alert('Keranjang masih kosong! Silakan pilih menu terlebih dahulu.');
+                    return;
+                }
 
-            fetch("{{ route('kasir.checkout') }}", {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'X-CSRF-TOKEN': '{{ csrf_token() }}'
-                },
-                body: JSON.stringify({ items: cart })
-            })
+                // 1. Tambahkan baris ini tepat sebelum fetch (di baris 230)
+                let noteValue = document.getElementById('order_note').value;
+
+                fetch("{{ route('kasir.checkout') }}", {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                    },
+                    // 2. Ubah baris 237 ini dengan menambahkan note: noteValue
+                    body: JSON.stringify({ items: cart, note: noteValue })
+                })
             .then(response => response.json())
             .then(data => {
                 if (data.success) {
