@@ -17,6 +17,13 @@
     <h1 class="text-white text-6xl md:text-8xl lg:text-[11rem] font-extrabold tracking-tight select-none">
         kasir.in
     </h1>
-
+    <script>
+    // Berpindah otomatis ke halaman login setelah 3 detik (3000 ms)
+    setTimeout(function() {
+        window.location.href = "{{ route('login') }}";
+        // Jika nama rutenya belum didefinisikan, bisa gunakan URL langsung:
+        // window.location.href = '/login';
+    }, 5000);
+</script>
 </body>
 </html>
