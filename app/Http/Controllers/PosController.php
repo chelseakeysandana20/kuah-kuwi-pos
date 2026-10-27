@@ -66,9 +66,10 @@ class PosController extends Controller
             DB::commit();
 
             return response()->json([
-                'success' => true,
-                'message' => 'Pembayaran berhasil! No Nota: ' . $transaction->receipt_number
-            ]);
+            'success' => true,
+            'message' => 'Pembayaran berhasil! No Nota: ' . $transaction->receipt_number,
+            'transaction_id' => $transaction->id // <-- Tambahkan baris ini (jangan lupa ada koma di baris atasnya)
+        ]);
 
         } catch (\Exception $e) {
             DB::rollBack();
@@ -77,5 +78,14 @@ class PosController extends Controller
                 'message' => 'Terjadi kesalahan: ' . $e->getMessage()
             ], 500);
         }
+    }
+
+    public function cetakStruk($id)
+    {
+        // Mengambil data transaksi berdasarkan ID
+        $transaction = Transaction::findOrFail($id);
+        
+        // Melempar data tersebut ke file tampilan struk
+        return view('kasir.struk', compact('transaction'));
     }
 }

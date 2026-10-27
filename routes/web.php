@@ -12,7 +12,7 @@ Route::get('/', function () {
         return redirect()->route('kasir.pos'); // Sesuaikan dengan nama rute pos milikmu
     }
     // Jika belum login, barulah tampilkan splash screen
-    return view('kasir.landing');
+    return view('landing');
 });
 
 // Route Guest (Hanya bisa diakses jika BELUM login)
@@ -36,6 +36,7 @@ Route::middleware('auth')->group(function () {
     Route::middleware('role:kasir')->prefix('kasir')->group(function () {
         Route::get('/pos', [PosController::class, 'index'])->name('kasir.pos');
         Route::post('/pos/checkout', [PosController::class, 'checkout'])->name('kasir.checkout');
+        Route::get('/struk/{id}', [PosController::class, 'cetakStruk'])->name('kasir.struk');
     });
 
     // Grup Khusus Staff Dapur

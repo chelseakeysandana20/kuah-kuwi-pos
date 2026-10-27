@@ -129,9 +129,9 @@
                                 Simpan
                             </button>
                             <!-- Ini tombol bayarnya yang diubah -->
-                            <button onclick="processPayment()" class="w-1/2 bg-red-600 text-white font-bold py-3 rounded-lg hover:bg-red-700 transition shadow-md">
-                                Bayar
-                            </button>
+                            <button onclick="showConfirmModal()" class="w-1/2 bg-red-600 text-white font-bold py-3 rounded-lg hover:bg-red-700 transition shadow-md">
+    Bayar
+</button>
                         </div>
                     </div>
                 </div>
@@ -140,6 +140,46 @@
         </main>
     </div>
 
+    <!-- Modal Konfirmasi Pesanan -->
+    <div id="confirm-modal" class="fixed inset-0 bg-black bg-opacity-50 hidden z-50 flex justify-center items-center">
+        <!-- max-w-md membuat ukurannya compact, tidak terlalu lebar -->
+        <div class="bg-white rounded-2xl shadow-2xl w-full max-w-md p-6 relative">
+            
+            <!-- Tombol Silang (Tutup) -->
+            <button onclick="closeConfirmModal()" class="absolute top-4 right-4 text-gray-400 hover:text-gray-600 transition">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+            </button>
+
+            <h2 class="text-xl font-bold text-gray-800 mb-4 border-b border-gray-100 pb-3">Konfirmasi Pesanan</h2>
+
+            <!-- Tabel Daftar Pesanan -->
+            <div class="max-h-60 overflow-y-auto mb-4 pr-1">
+                <table class="w-full text-sm text-left text-gray-600">
+                    <thead class="text-xs text-gray-400 uppercase border-b border-gray-200 bg-white sticky top-0">
+                        <tr>
+                            <th class="py-2 font-medium">Menu</th>
+                            <th class="py-2 text-center font-medium">Qty</th>
+                            <th class="py-2 text-right font-medium">Subtotal</th>
+                        </tr>
+                    </thead>
+                    <tbody id="modal-cart-list" class="divide-y divide-gray-100">
+                        <!-- Data pesanan akan disuntikkan oleh JavaScript di sini -->
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Total Harga -->
+            <div class="flex justify-between items-center border-t border-gray-200 pt-4 mb-6">
+                <span class="text-gray-500 font-medium">Total</span>
+                <span class="font-bold text-xl text-gray-900" id="modal-total-price">Rp 0</span>
+            </div>
+
+            <!-- Tombol Konfirmasi (Ini yang memicu pembayaran) -->
+            <button onclick="processPayment()" class="w-full bg-[#DE3B4C] hover:bg-red-700 text-white font-bold py-3 rounded-xl transition shadow-md">
+                Konfirmasi Pesanan
+            </button>
+        </div>
+    </div>
     <!-- Script JavaScript untuk Keranjang & Jam Real-time -->
     <script>
         // Jam Real-time
@@ -223,38 +263,91 @@
             totalEl.innerText = formatRupiah(subtotal);
         }
         function processPayment() {
-                if (cart.length === 0) {
-                    alert('Keranjang masih kosong! Silakan pilih menu terlebih dahulu.');
-                    return;
-                }
+    if (cart.length === 0) {
+        alert('Keranjang masih kosong! Silakan pilih menu terlebih dahulu.');
+        return;
+    }
 
-                // 1. Tambahkan baris ini tepat sebelum fetch (di baris 230)
-                let noteValue = document.getElementById('order_note').value;
+    let noteElement = document.getElementById('order_note');
+    let noteValue = noteElement ? noteElement.value : '';
 
-                fetch("{{ route('kasir.checkout') }}", {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'X-CSRF-TOKEN': '{{ csrf_token() }}'
-                    },
-                    // 2. Ubah baris 237 ini dengan menambahkan note: noteValue
-                    body: JSON.stringify({ items: cart, note: noteValue })
-                })
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
-                    alert(data.message); // Menampilkan pesan sukses dan Nomor Nota
-                    cart = []; // Mengosongkan keranjang kembali
-                    renderCart(); // Memperbarui tampilan keranjang
-                } else {
-                    alert('Gagal: ' + data.message);
-                }
-            })
-            .catch(error => {
-                console.error('Error:', error);
-                alert('Terjadi kesalahan pada server saat memproses pembayaran.');
-            });
+    fetch("{{ route('kasir.checkout') }}", {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRF-TOKEN': '{{ csrf_token() }}'
+        },
+        body: JSON.stringify({ items: cart, note: noteValue })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            // 1. Munculkan alert sukses
+            alert(data.message);
+            
+            // 2. Kosongkan keranjang & perbarui tampilan
+            cart = [];
+            if (typeof renderCart === 'function') {
+                renderCart();
+            }
+            
+            // 3. Kosongkan catatan pesanan
+            if (noteElement) {
+                noteElement.value = ''; 
+            }
+            
+            // 4. Buka halaman struk di tab baru
+            if (data.transaction_id) {
+                window.open('/kasir/struk/' + data.transaction_id, '_blank');
+            } else {
+                console.error('Transaction ID tidak ditemukan');
+            }
+        } else {
+            alert('Gagal: ' + data.message);
         }
+    })
+    .catch(error => {
+        console.error('Error detail:', error);
+        // Menampilkan pesan error asli agar kita tahu bagian mana yang kendala
+        alert('Terjadi kesalahan JavaScript: ' + error.message);
+    });
+    }
+
+    function showConfirmModal() {
+    if (cart.length === 0) {
+        alert('Keranjang masih kosong! Silakan pilih menu terlebih dahulu.');
+        return;
+    }
+
+    let modalList = document.getElementById('modal-cart-list');
+    let modalTotal = document.getElementById('modal-total-price');
+    let total = 0;
+    
+    // Kosongkan tabel modal sebelumnya
+    modalList.innerHTML = ''; 
+
+    // Loop data keranjang dan masukkan ke tabel modal
+    cart.forEach(item => {
+        let subtotal = item.price * item.quantity;
+        total += subtotal;
+
+        modalList.innerHTML += `
+            <tr>
+                <td class="py-3 font-medium text-gray-800">${item.name}</td>
+                <td class="py-3 text-center text-gray-600">${item.quantity}</td>
+                <td class="py-3 text-right font-medium text-gray-800">Rp ${subtotal.toLocaleString('id-ID')}</td>
+            </tr>
+        `;
+    });
+
+    // Tampilkan total dan buka modal
+    modalTotal.innerHTML = `Rp ${total.toLocaleString('id-ID')}`;
+    document.getElementById('confirm-modal').classList.remove('hidden');
+    }
+
+function closeConfirmModal() {
+    document.getElementById('confirm-modal').classList.add('hidden');
+    }
     </script>
 </body>
 </html>
