@@ -130,8 +130,8 @@
                             </button>
                             <!-- Ini tombol bayarnya yang diubah -->
                             <button onclick="showConfirmModal()" class="w-1/2 bg-red-600 text-white font-bold py-3 rounded-lg hover:bg-red-700 transition shadow-md">
-    Bayar
-</button>
+                            Bayar
+                        </button>
                         </div>
                     </div>
                 </div>
@@ -142,18 +142,30 @@
 
     <!-- Modal Konfirmasi Pesanan -->
     <div id="confirm-modal" class="fixed inset-0 bg-black bg-opacity-50 hidden z-50 flex justify-center items-center">
-        <!-- max-w-md membuat ukurannya compact, tidak terlalu lebar -->
         <div class="bg-white rounded-2xl shadow-2xl w-full max-w-md p-6 relative">
             
-            <!-- Tombol Silang (Tutup) -->
+            <!-- Tombol Silang -->
             <button onclick="closeConfirmModal()" class="absolute top-4 right-4 text-gray-400 hover:text-gray-600 transition">
                 <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
             </button>
 
             <h2 class="text-xl font-bold text-gray-800 mb-4 border-b border-gray-100 pb-3">Konfirmasi Pesanan</h2>
 
+            <!-- Tipe Pesanan / Nomor Meja (Dropdown Otomatis) -->
+            <div class="mb-4">
+                <label for="table_number" class="block text-sm font-medium text-gray-700 mb-1">Tipe Pesanan / Meja</label>
+                <select id="table_number" class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-red-500 bg-gray-50">
+                    <option value="Takeaway">Takeaway (Bawa Pulang)</option>
+                    <option value="Meja 1">Dine In - Meja 1</option>
+                    <option value="Meja 2">Dine In - Meja 2</option>
+                    <option value="Meja 3">Dine In - Meja 3</option>
+                    <option value="Meja 4">Dine In - Meja 4</option>
+                    <option value="Meja 5">Dine In - Meja 5</option>
+                </select>
+            </div>
+
             <!-- Tabel Daftar Pesanan -->
-            <div class="max-h-60 overflow-y-auto mb-4 pr-1">
+            <div class="max-h-40 overflow-y-auto mb-4 pr-1">
                 <table class="w-full text-sm text-left text-gray-600">
                     <thead class="text-xs text-gray-400 uppercase border-b border-gray-200 bg-white sticky top-0">
                         <tr>
@@ -163,20 +175,35 @@
                         </tr>
                     </thead>
                     <tbody id="modal-cart-list" class="divide-y divide-gray-100">
-                        <!-- Data pesanan akan disuntikkan oleh JavaScript di sini -->
+                        <!-- Data pesanan -->
                     </tbody>
                 </table>
             </div>
 
             <!-- Total Harga -->
-            <div class="flex justify-between items-center border-t border-gray-200 pt-4 mb-6">
-                <span class="text-gray-500 font-medium">Total</span>
-                <span class="font-bold text-xl text-gray-900" id="modal-total-price">Rp 0</span>
+            <div class="flex justify-between items-center border-t border-gray-200 pt-4 mb-4">
+                <span class="text-gray-500 font-medium">Total Keseluruhan</span>
+                <span class="font-bold text-2xl text-gray-900" id="modal-total-price">Rp 0</span>
             </div>
 
-            <!-- Tombol Konfirmasi (Ini yang memicu pembayaran) -->
-            <button onclick="processPayment()" class="w-full bg-[#DE3B4C] hover:bg-red-700 text-white font-bold py-3 rounded-xl transition shadow-md">
-                Konfirmasi Pesanan
+            <!-- Pilihan Metode Pembayaran (Berfungsi sebagai Toggle) -->
+            <div class="mb-6">
+                <p class="text-xs font-medium text-gray-400 text-center mb-2 uppercase tracking-wider">Metode Pembayaran</p>
+                <div class="flex gap-3">
+                    <!-- Secara default Cash aktif (Merah) -->
+                    <button id="btn-cash" onclick="selectPayment('CASH')" class="w-1/2 bg-red-600 text-white font-bold py-2 rounded-xl border-2 border-red-600 transition shadow-sm">
+                        CASH
+                    </button>
+                    <!-- Secara default QRIS tidak aktif (Putih bergaris abu) -->
+                    <button id="btn-qris" onclick="selectPayment('QRIS')" class="w-1/2 bg-white text-gray-700 font-bold py-2 rounded-xl border-2 border-gray-200 hover:border-red-600 hover:text-red-600 transition shadow-sm">
+                        QRIS
+                    </button>
+                </div>
+            </div>
+
+            <!-- Tombol Eksekusi Utama -->
+            <button onclick="processPayment()" class="w-full bg-green-600 hover:bg-green-700 text-white font-bold py-3 rounded-xl transition shadow-md">
+                Konfirmasi & Bayar
             </button>
         </div>
     </div>
@@ -262,55 +289,75 @@
             subTotalEl.innerText = formatRupiah(subtotal);
             totalEl.innerText = formatRupiah(subtotal);
         }
-        function processPayment() {
-    if (cart.length === 0) {
-        alert('Keranjang masih kosong! Silakan pilih menu terlebih dahulu.');
-        return;
-    }
 
-    let noteElement = document.getElementById('order_note');
-    let noteValue = noteElement ? noteElement.value : '';
+        let selectedPaymentMethod = 'CASH'; // Default pembayaran
 
-    fetch("{{ route('kasir.checkout') }}", {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-            'X-CSRF-TOKEN': '{{ csrf_token() }}'
-        },
-        body: JSON.stringify({ items: cart, note: noteValue })
-    })
-    .then(response => response.json())
-    .then(data => {
-        if (data.success) {
-            // 1. Munculkan alert sukses
-            alert(data.message);
-            
-            // 2. Kosongkan keranjang & perbarui tampilan
-            cart = [];
-            if (typeof renderCart === 'function') {
-                renderCart();
-            }
-            
-            // 3. Kosongkan catatan pesanan
-            if (noteElement) {
-                noteElement.value = ''; 
-            }
-            
-            // 4. Buka halaman struk di tab baru
-            if (data.transaction_id) {
-                window.open('/kasir/struk/' + data.transaction_id, '_blank');
-            } else {
-                console.error('Transaction ID tidak ditemukan');
-            }
+    // Fungsi untuk mengubah warna tombol CASH/QRIS saat diklik
+    function selectPayment(method) {
+        selectedPaymentMethod = method;
+        const btnCash = document.getElementById('btn-cash');
+        const btnQris = document.getElementById('btn-qris');
+
+        if (method === 'CASH') {
+            btnCash.className = "w-1/2 bg-red-600 text-white font-bold py-2 rounded-xl border-2 border-red-600 transition shadow-sm";
+            btnQris.className = "w-1/2 bg-white text-gray-700 font-bold py-2 rounded-xl border-2 border-gray-200 hover:border-red-600 hover:text-red-600 transition shadow-sm";
         } else {
-            alert('Gagal: ' + data.message);
+            btnQris.className = "w-1/2 bg-red-600 text-white font-bold py-2 rounded-xl border-2 border-red-600 transition shadow-sm";
+            btnCash.className = "w-1/2 bg-white text-gray-700 font-bold py-2 rounded-xl border-2 border-gray-200 hover:border-red-600 hover:text-red-600 transition shadow-sm";
         }
-    })
-    .catch(error => {
-        console.error('Error detail:', error);
-        // Menampilkan pesan error asli agar kita tahu bagian mana yang kendala
-        alert('Terjadi kesalahan JavaScript: ' + error.message);
-    });
+    }
+        // Tambahkan parameter paymentMethod (default 'CASH')
+    function processPayment() {
+        if (cart.length === 0) {
+            alert('Keranjang masih kosong! Silakan pilih menu terlebih dahulu.');
+            return;
+        }
+
+        let noteElement = document.getElementById('order_note');
+        let noteValue = noteElement ? noteElement.value : '';
+        
+        // Ambil nilai dari input Nomor Meja
+        let tableElement = document.getElementById('table_number');
+        let tableValue = tableElement ? tableElement.value : '';
+
+        fetch("{{ route('kasir.checkout') }}", {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRF-TOKEN': '{{ csrf_token() }}'
+            },
+            // Tambahkan payment_method dan table_number agar dikirim ke Laravel
+            body: JSON.stringify({ 
+                items: cart, 
+                note: noteValue,
+                payment_method: selectedPaymentMethod,
+                table_number: tableValue
+            })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                closeConfirmModal();
+                
+                cart = [];
+                if (typeof renderCart === 'function') {
+                    renderCart();
+                }
+                
+                if (noteElement) noteElement.value = ''; 
+                if (tableElement) tableElement.value = ''; // Kosongkan input meja juga
+                
+                if (data.transaction_id) {
+                    window.open('/kasir/struk/' + data.transaction_id, '_blank');
+                }
+            } else {
+                alert('Gagal: ' + data.message);
+            }
+        })
+        .catch(error => {
+            console.error('Error detail:', error);
+            alert('Terjadi kesalahan JavaScript: ' + error.message);
+        });
     }
 
     function showConfirmModal() {
