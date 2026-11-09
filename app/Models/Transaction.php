@@ -6,7 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class Transaction extends Model
 {
-    protected $fillable = ['user_id', 'receipt_number', 'total_amount', 'note'];
+    protected $fillable = ['user_id', 'receipt_number', 'total_amount', 'note', 'table_number', 'status'];
 
     // Satu transaksi memiliki banyak detail item
     public function details()

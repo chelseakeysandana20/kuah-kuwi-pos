@@ -9,7 +9,7 @@ use Illuminate\Support\Facades\Auth;
 Route::get('/', function () {
     // Jika kasir sudah login, langsung lempar ke halaman POS
     if (Auth::check()) {
-        return redirect()->route('kasir.pos'); // Sesuaikan dengan nama rute pos milikmu
+        return redirect()->route('kasir.index'); // Sesuaikan dengan nama rute pos milikmu
     }
     // Jika belum login, barulah tampilkan splash screen
     return view('landing');
@@ -34,9 +34,11 @@ Route::middleware('auth')->group(function () {
 
     // Grup Khusus Kasir
     Route::middleware('role:kasir')->prefix('kasir')->group(function () {
-        Route::get('/pos', [PosController::class, 'index'])->name('kasir.pos');
+        Route::get('/pos', [PosController::class, 'index'])->name('kasir.index');
         Route::post('/pos/checkout', [PosController::class, 'checkout'])->name('kasir.checkout');
         Route::get('/struk/{id}', [PosController::class, 'cetakStruk'])->name('kasir.struk');
+        Route::get('/openticket', [PosController::class, 'openTicket'])->name('kasir.openticket');
+        Route::post('/openticket/complete/{id}', [PosController::class, 'completeTicket'])->name('kasir.openticket.complete');
     });
 
     // Grup Khusus Staff Dapur
