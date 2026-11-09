@@ -180,6 +180,14 @@
                 </table>
             </div>
 
+            <!-- KOTAK CATATAN DITARUH DI SINI -->
+            <div id="modal-note-section" class="mb-4 hidden">
+                <div class="bg-yellow-50 border border-yellow-300 rounded-lg p-3 shadow-sm">
+                    <span class="block text-xs font-bold text-yellow-800 mb-1">Catatan Pesanan:</span>
+                    <span id="modal-note-display" class="text-sm text-yellow-700 italic font-medium"></span>
+                </div>
+            </div>
+
             <!-- Total Harga -->
             <div class="flex justify-between items-center border-t border-gray-200 pt-4 mb-4">
                 <span class="text-gray-500 font-medium">Total Keseluruhan</span>
@@ -361,39 +369,57 @@
     }
 
     function showConfirmModal() {
-    if (cart.length === 0) {
-        alert('Keranjang masih kosong! Silakan pilih menu terlebih dahulu.');
-        return;
+        if (cart.length === 0) {
+            alert('Keranjang masih kosong! Silakan pilih menu terlebih dahulu.');
+            return;
+        }
+
+        let modalList = document.getElementById('modal-cart-list');
+        let modalTotal = document.getElementById('modal-total-price');
+        let total = 0;
+        
+        // Kosongkan tabel modal sebelumnya
+        modalList.innerHTML = ''; 
+
+        // Loop data keranjang dan masukkan ke tabel modal
+        cart.forEach(item => {
+            let subtotal = item.price * item.quantity;
+            total += subtotal;
+
+            modalList.innerHTML += `
+                <tr>
+                    <td class="py-3 font-medium text-gray-800">${item.name}</td>
+                    <td class="py-3 text-center text-gray-600">${item.quantity}</td>
+                    <td class="py-3 text-right font-medium text-gray-800">Rp ${subtotal.toLocaleString('id-ID')}</td>
+                </tr>
+            `;
+        });
+
+        // ----------------------------------------------------
+        // TANGKAP DAN TAMPILKAN CATATAN PESANAN DI MODAL
+        // ----------------------------------------------------
+        let noteInput = document.getElementById('order_note').value;
+        let noteSection = document.getElementById('modal-note-section');
+        let noteDisplay = document.getElementById('modal-note-display');
+
+        // Pastikan elemen noteSection dan noteDisplay ada di HTML
+        if (noteSection && noteDisplay) {
+            if (noteInput.trim() !== '') {
+                // Jika ada catatan, isi teksnya dan munculkan kotak kuning
+                noteDisplay.innerText = noteInput;
+                noteSection.classList.remove('hidden');
+            } else {
+                // Jika kosong, sembunyikan kotak kuningnya
+                noteSection.classList.add('hidden');
+            }
+        }
+
+        // Tampilkan total dan buka modal
+        modalTotal.innerHTML = `Rp ${total.toLocaleString('id-ID')}`;
+        document.getElementById('confirm-modal').classList.remove('hidden');
     }
-
-    let modalList = document.getElementById('modal-cart-list');
-    let modalTotal = document.getElementById('modal-total-price');
-    let total = 0;
-    
-    // Kosongkan tabel modal sebelumnya
-    modalList.innerHTML = ''; 
-
-    // Loop data keranjang dan masukkan ke tabel modal
-    cart.forEach(item => {
-        let subtotal = item.price * item.quantity;
-        total += subtotal;
-
-        modalList.innerHTML += `
-            <tr>
-                <td class="py-3 font-medium text-gray-800">${item.name}</td>
-                <td class="py-3 text-center text-gray-600">${item.quantity}</td>
-                <td class="py-3 text-right font-medium text-gray-800">Rp ${subtotal.toLocaleString('id-ID')}</td>
-            </tr>
-        `;
-    });
-
-    // Tampilkan total dan buka modal
-    modalTotal.innerHTML = `Rp ${total.toLocaleString('id-ID')}`;
-    document.getElementById('confirm-modal').classList.remove('hidden');
-    }
-
-function closeConfirmModal() {
-    document.getElementById('confirm-modal').classList.add('hidden');
+    function closeConfirmModal() {
+        document.getElementById('confirm-modal').classList.add('hidden');
     }
     </script>
 </body>
