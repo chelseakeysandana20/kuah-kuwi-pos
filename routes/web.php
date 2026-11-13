@@ -39,6 +39,7 @@ Route::middleware('auth')->group(function () {
         Route::get('/struk/{id}', [PosController::class, 'cetakStruk'])->name('kasir.struk');
         Route::get('/openticket', [PosController::class, 'openTicket'])->name('kasir.openticket');
         Route::post('/openticket/complete/{id}', [PosController::class, 'completeTicket'])->name('kasir.openticket.complete');
+        Route::get('/riwayat', [PosController::class, 'riwayat'])->name('kasir.riwayat');
     });
 
     // Grup Khusus Staff Dapur

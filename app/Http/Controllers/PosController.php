@@ -126,4 +126,15 @@ class PosController extends Controller
             ], 500);
         }
     }
+
+    public function riwayat()
+    {
+        // Ambil semua transaksi yang sudah lunas (paid) beserta detail produknya
+        $riwayatTransaksi = Transaction::with('details.product')
+                            ->where('status', 'paid')
+                            ->latest()
+                            ->get();
+
+        return view('kasir.riwayat', compact('riwayatTransaksi'));
+    }
 }
