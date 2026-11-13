@@ -232,6 +232,22 @@
             </button>
         </div>
     </div>
+
+    <!-- Modal Sukses Open Ticket -->
+    <div id="success-modal" class="fixed inset-0 z-50 hidden bg-black bg-opacity-50 flex items-center justify-center">
+        <div class="bg-white rounded-2xl shadow-xl p-6 w-80 text-center transform transition-all">
+            <div class="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                <svg class="w-8 h-8 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"></path>
+                </svg>
+            </div>
+            <h3 class="text-lg font-bold text-gray-800 mb-2">Berhasil!</h3>
+            <p class="text-sm text-gray-600 mb-6">Pesanan berhasil disimpan ke Open tiket.</p>
+            <button onclick="closeSuccessModal()" class="w-full bg-green-500 hover:bg-green-600 text-white font-bold py-2.5 rounded-xl transition shadow-md">
+                OK
+            </button>
+        </div>
+    </div>
     <!-- Script JavaScript untuk Keranjang & Jam Real-time -->
     <script>
         // Jam Real-time
@@ -339,14 +355,18 @@
             return;
         }
 
-        let noteInput = document.getElementById('order_note') ? document.getElementById('order_note').value : '';
-        // Gunakan fungsi prompt/alert sementara untuk meminta nomor meja jika belum dipilih
-        let tableNumber = prompt("Masukkan Tipe Pesanan / Nomor Meja (Contoh: Takeaway / Meja 1):", "Takeaway");
-        
+        // Ambil nilai meja langsung dari dropdown panel kanan
+        let tableElement = document.getElementById('table_number');
+        let tableNumber = tableElement ? tableElement.value : '';
+
+        // Validasi wajib memilih meja/tipe pesanan terlebih dahulu
         if (!tableNumber) {
-            alert('Penyimpanan dibatalkan karena nomor meja kosong.');
+            alert('Silakan pilih Tipe Pesanan/Meja terlebih dahulu di panel detail pesanan!');
+            if (tableElement) tableElement.focus();
             return;
         }
+
+        let noteInput = document.getElementById('order_note') ? document.getElementById('order_note').value : '';
 
         // Kirim data ke controller dengan penanda status 'saved'
         fetch("{{ route('kasir.checkout') }}", {
@@ -359,19 +379,15 @@
                 items: cart, 
                 note: noteInput,
                 table_number: tableNumber,
-                status: 'saved', // Penanda bahwa ini hanya di-simpan, bukan dibayar
-                payment_method: null // Belum ada metode pembayaran
+                status: 'saved', // Penanda bahwa ini disimpan ke open ticket
+                payment_method: null 
             })
         })
         .then(response => response.json())
         .then(data => {
             if (data.success) {
-                alert('Pesanan berhasil disimpan ke Open Ticket!');
-                
-                // Reset form dan keranjang
-                cart = [];
-                if (typeof renderCart === 'function') renderCart();
-                if (document.getElementById('order_note')) document.getElementById('order_note').value = ''; 
+                // TAMPILKAN MODAL SUKSES KUSTOM DI TENGAH LAYAR
+                document.getElementById('success-modal').classList.remove('hidden');
             } else {
                 alert('Gagal menyimpan: ' + data.message);
             }
@@ -382,6 +398,13 @@
         });
     }
 
+    // Fungsi untuk menutup modal sukses dan me-refresh halaman
+    function closeSuccessModal() {
+        document.getElementById('success-modal').classList.add('hidden');
+        cart = [];
+        if (typeof renderCart === 'function') renderCart();
+        location.reload();
+    }
         // Tambahkan parameter paymentMethod (default 'CASH')
     function processPayment() {
         if (cart.length === 0) {
