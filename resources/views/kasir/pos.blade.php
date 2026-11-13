@@ -80,8 +80,16 @@
                 
                 <!-- Daftar Menu -->
                 <div class="w-2/3">
-                    <div class="flex justify-between items-center mb-4">
+                    <div class="flex justify-between items-center mb-6">
                         <h2 class="text-lg font-bold text-gray-800">Daftar Menu</h2>
+    
+                        <!-- Input Search Bar -->
+                        <div class="relative w-72">
+                            <div class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
+                                <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
+                            </div>
+                            <input type="text" id="search-menu" class="bg-white border border-gray-300 text-gray-900 text-sm rounded-xl focus:ring-red-500 focus:border-red-500 block w-full pl-10 p-2.5 shadow-sm transition" placeholder="Search menu..">
+                        </div>
                     </div>
                     
                     <div class="grid grid-cols-3 gap-4">
@@ -98,7 +106,15 @@
                 <!-- Panel Keranjang (Detail Pesanan) -->
                 <div class="w-1/3 bg-white p-5 rounded-xl shadow-sm border border-gray-200 h-fit sticky top-0 flex flex-col">
                     <h2 class="text-lg font-bold text-blue-800 border-b pb-3 mb-4">Detail pesanan</h2>
-                    
+                    <div class="flex items-center justify-between bg-gray-50 p-2.5 rounded-lg border border-gray-200 shadow-sm mb-4">
+                        <span class="text-sm font-semibold text-gray-700">Tipe:</span>
+                        <!-- ID 'table_number' ini wajib ada agar script JS bisa mengambil nilainya saat tombol Simpan ditekan -->
+                        <select id="table_number" class="bg-white border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-red-500 focus:border-red-500 block p-1.5 font-bold text-blue-800 outline-none cursor-pointer">
+                            <option value="" disabled selected>-- Pilih --</option>
+                            <option value="Takeaway">Takeaway</option>
+                            <option value="Dine In">Dine In</option>
+                        </select>
+                    </div>
                     <!-- Container Daftar Item di Keranjang -->
                     <div id="cart-items" class="space-y-3 max-h-[280px] overflow-y-auto pr-1 mb-4">
                         <div class="text-gray-400 text-center py-10 text-sm italic">
