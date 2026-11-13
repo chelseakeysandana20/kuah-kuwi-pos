@@ -169,15 +169,11 @@
 
             <!-- Tipe Pesanan / Nomor Meja (Dropdown Otomatis) -->
             <div class="mb-4">
-                <label for="table_number" class="block text-sm font-medium text-gray-700 mb-1">Tipe Pesanan / Meja</label>
-                <select id="table_number" class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-red-500 bg-gray-50">
-                    <option value="Takeaway">Takeaway (Bawa Pulang)</option>
-                    <option value="Meja 1">Dine In - Meja 1</option>
-                    <option value="Meja 2">Dine In - Meja 2</option>
-                    <option value="Meja 3">Dine In - Meja 3</option>
-                    <option value="Meja 4">Dine In - Meja 4</option>
-                    <option value="Meja 5">Dine In - Meja 5</option>
-                </select>
+                <span class="block text-sm font-medium text-gray-700 mb-1">Tipe Pesanan / Meja</span>
+                <!-- Elemen teks ini akan diisi otomatis oleh JavaScript -->
+                <div id="modal-table-display" class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm bg-gray-100 font-bold text-gray-800">
+                    -
+                </div>
             </div>
 
             <!-- Tabel Daftar Pesanan -->
@@ -436,55 +432,72 @@
     }
 
     function showConfirmModal() {
-        if (cart.length === 0) {
-            alert('Keranjang masih kosong! Silakan pilih menu terlebih dahulu.');
-            return;
-        }
-
-        let modalList = document.getElementById('modal-cart-list');
-        let modalTotal = document.getElementById('modal-total-price');
-        let total = 0;
-        
-        // Kosongkan tabel modal sebelumnya
-        modalList.innerHTML = ''; 
-
-        // Loop data keranjang dan masukkan ke tabel modal
-        cart.forEach(item => {
-            let subtotal = item.price * item.quantity;
-            total += subtotal;
-
-            modalList.innerHTML += `
-                <tr>
-                    <td class="py-3 font-medium text-gray-800">${item.name}</td>
-                    <td class="py-3 text-center text-gray-600">${item.quantity}</td>
-                    <td class="py-3 text-right font-medium text-gray-800">Rp ${subtotal.toLocaleString('id-ID')}</td>
-                </tr>
-            `;
-        });
-
-        // ----------------------------------------------------
-        // TANGKAP DAN TAMPILKAN CATATAN PESANAN DI MODAL
-        // ----------------------------------------------------
-        let noteInput = document.getElementById('order_note').value;
-        let noteSection = document.getElementById('modal-note-section');
-        let noteDisplay = document.getElementById('modal-note-display');
-
-        // Pastikan elemen noteSection dan noteDisplay ada di HTML
-        if (noteSection && noteDisplay) {
-            if (noteInput.trim() !== '') {
-                // Jika ada catatan, isi teksnya dan munculkan kotak kuning
-                noteDisplay.innerText = noteInput;
-                noteSection.classList.remove('hidden');
-            } else {
-                // Jika kosong, sembunyikan kotak kuningnya
-                noteSection.classList.add('hidden');
+            if (cart.length === 0) {
+                alert('Keranjang masih kosong! Silakan pilih menu terlebih dahulu.');
+                return;
             }
-        }
 
-        // Tampilkan total dan buka modal
-        modalTotal.innerHTML = `Rp ${total.toLocaleString('id-ID')}`;
-        document.getElementById('confirm-modal').classList.remove('hidden');
-    }
+            // ----------------------------------------------------
+            // TANGKAP DAN VALIDASI PILIHAN MEJA DARI PANEL KANAN
+            // ----------------------------------------------------
+            let tableSelect = document.getElementById('table_number');
+            let selectedTable = tableSelect.value; // Mengambil value yang dipilih (Takeaway / Meja 1, dll)
+
+            if (!selectedTable) {
+                // Hentikan proses jika kasir belum memilih meja/takeaway
+                alert('Silakan pilih Tipe Pesanan/Meja terlebih dahulu di detail pesanan!');
+                tableSelect.focus(); // Arahkan fokus kembali ke dropdown
+                return; 
+            }
+
+            // Masukkan teks pilihan meja ke dalam kotak statis di modal
+            document.getElementById('modal-table-display').innerText = selectedTable;
+            // ----------------------------------------------------
+
+            let modalList = document.getElementById('modal-cart-list');
+            let modalTotal = document.getElementById('modal-total-price');
+            let total = 0;
+            
+            // Kosongkan tabel modal sebelumnya
+            modalList.innerHTML = ''; 
+
+            // Loop data keranjang dan masukkan ke tabel modal
+            cart.forEach(item => {
+                let subtotal = item.price * item.quantity;
+                total += subtotal;
+
+                modalList.innerHTML += `
+                    <tr>
+                        <td class="py-3 font-medium text-gray-800">${item.name}</td>
+                        <td class="py-3 text-center text-gray-600">${item.quantity}</td>
+                        <td class="py-3 text-right font-medium text-gray-800">Rp ${subtotal.toLocaleString('id-ID')}</td>
+                    </tr>
+                `;
+            });
+
+            // ----------------------------------------------------
+            // TANGKAP DAN TAMPILKAN CATATAN PESANAN DI MODAL
+            // ----------------------------------------------------
+            let noteInput = document.getElementById('order_note').value;
+            let noteSection = document.getElementById('modal-note-section');
+            let noteDisplay = document.getElementById('modal-note-display');
+
+            // Pastikan elemen noteSection dan noteDisplay ada di HTML
+            if (noteSection && noteDisplay) {
+                if (noteInput.trim() !== '') {
+                    // Jika ada catatan, isi teksnya dan munculkan kotak kuning
+                    noteDisplay.innerText = noteInput;
+                    noteSection.classList.remove('hidden');
+                } else {
+                    // Jika kosong, sembunyikan kotak kuningnya
+                    noteSection.classList.add('hidden');
+                }
+            }
+
+            // Tampilkan total dan buka modal
+            modalTotal.innerHTML = `Rp ${total.toLocaleString('id-ID')}`;
+            document.getElementById('confirm-modal').classList.remove('hidden');
+        }
 
     function closeConfirmModal() {
         document.getElementById('confirm-modal').classList.add('hidden');
