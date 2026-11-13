@@ -100,9 +100,93 @@
 
     </div>
 
+    <!-- Modal Konfirmasi Pembayaran Open Ticket -->
+    <div id="confirm-modal" class="fixed inset-0 z-50 hidden bg-black bg-opacity-50 flex items-center justify-center">
+        <div class="bg-white rounded-2xl shadow-2xl p-6 w-[450px] max-w-full transform transition-all relative">
+            <!-- Tombol Close -->
+            <button onclick="closeConfirmModal()" class="absolute top-4 right-4 text-gray-400 hover:text-gray-600">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+            </button>
+
+            <h3 class="text-lg font-bold text-gray-800 mb-4">Konfirmasi Pesanan</h3>
+
+            <!-- Tipe Pesanan / Meja (Tampil Statis) -->
+            <div class="mb-4">
+                <span class="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-1">Tipe Pesanan / Meja</span>
+                <div id="modal-table-display" class="bg-gray-100 border border-gray-200 text-gray-900 font-bold px-4 py-2.5 rounded-lg w-full">
+                    -
+                </div>
+            </div>
+
+            <!-- Tabel Daftar Item -->
+            <div class="max-h-40 overflow-y-auto mb-4 pr-1">
+                <table class="w-full text-left text-sm">
+                    <thead>
+                        <tr class="border-b text-xs text-gray-400 uppercase">
+                            <th class="pb-2 font-semibold">Menu</th>
+                            <th class="pb-2 text-center font-semibold">QTY</th>
+                            <th class="pb-2 text-right font-semibold">Subtotal</th>
+                        </tr>
+                    </thead>
+                    <tbody id="modal-cart-list" class="divide-y divide-gray-100">
+                        <!-- Diisi via JavaScript -->
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Bagian Catatan (Opsional) -->
+            <div id="modal-note-section" class="mb-4 bg-amber-50 border border-amber-200 rounded-xl p-3 hidden">
+                <span class="block text-xs font-bold text-amber-700 uppercase tracking-wider mb-1">Catatan Pesanan:</span>
+                <p id="modal-note-display" class="text-sm text-amber-900 italic"></p>
+            </div>
+
+            <!-- Total Keseluruhan -->
+            <div class="flex justify-between items-center mb-6 pt-3 border-t border-dashed">
+                <span class="text-sm font-semibold text-gray-600">Total Keseluruhan</span>
+                <span id="modal-total-price" class="text-xl font-bold text-red-600">Rp 0</span>
+            </div>
+
+            <!-- Pilihan Metode Pembayaran -->
+            <div class="mb-6">
+                <span class="block text-xs font-bold text-gray-400 uppercase tracking-wider mb-2 text-center">Metode Pembayaran</span>
+                <div class="flex gap-3">
+                    <button type="button" id="btn-cash" onclick="selectPayment('CASH')" class="w-1/2 bg-red-600 text-white font-bold py-2.5 rounded-xl border-2 border-red-600 transition shadow-sm text-sm">
+                        CASH
+                    </button>
+                    <button type="button" id="btn-qris" onclick="selectPayment('QRIS')" class="w-1/2 bg-white text-gray-700 font-bold py-2.5 rounded-xl border-2 border-gray-200 hover:border-red-600 hover:text-red-600 transition shadow-sm text-sm">
+                        QRIS
+                    </button>
+                </div>
+            </div>
+
+            <!-- Tombol Aksi -->
+            <button onclick="processPayment()" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-3 rounded-xl transition shadow-md text-sm">
+                Konfirmasi & Bayar
+            </button>
+        </div>
+    </div>
+
+    <!-- Script JavaScript Halaman Open Ticket -->
     <script>
         let selectedTicket = null;
+        let selectedPaymentMethod = 'CASH';
 
+        // Pilih metode pembayaran di dalam modal
+        function selectPayment(method) {
+            selectedPaymentMethod = method;
+            const btnCash = document.getElementById('btn-cash');
+            const btnQris = document.getElementById('btn-qris');
+
+            if (method === 'CASH') {
+                btnCash.className = "w-1/2 bg-red-600 text-white font-bold py-2.5 rounded-xl border-2 border-red-600 transition shadow-sm text-sm";
+                btnQris.className = "w-1/2 bg-white text-gray-700 font-bold py-2.5 rounded-xl border-2 border-gray-200 hover:border-red-600 hover:text-red-600 transition shadow-sm text-sm";
+            } else {
+                btnQris.className = "w-1/2 bg-red-600 text-white font-bold py-2.5 rounded-xl border-2 border-red-600 transition shadow-sm text-sm";
+                btnCash.className = "w-1/2 bg-white text-gray-700 font-bold py-2.5 rounded-xl border-2 border-gray-200 hover:border-red-600 hover:text-red-600 transition shadow-sm text-sm";
+            }
+        }
+
+        // Saat tiket diklik dari daftar sebelah kiri
         function selectTicket(ticket) {
             selectedTicket = ticket;
             document.getElementById('detail-title').innerText = `Detail Pesanan (${ticket.table_number})`;
@@ -126,28 +210,89 @@
             document.getElementById('detail-footer').classList.remove('hidden');
         }
 
+        // Saat tombol "Bayar / Selesaikan Pesanan" diklik -> Buka Modal Konfirmasi
         function payTicket() {
+            if (!selectedTicket) {
+                alert('Silakan pilih tiket terlebih dahulu dari daftar di sebelah kiri!');
+                return;
+            }
+
+            // Tampilkan tipe pesanan / meja ke modal
+            document.getElementById('modal-table-display').innerText = selectedTicket.table_number;
+
+            // Masukkan item ke tabel modal
+            let modalList = document.getElementById('modal-cart-list');
+            modalList.innerHTML = '';
+            
+            selectedTicket.details.forEach(detail => {
+                modalList.innerHTML += `
+                    <tr>
+                        <td class="py-3 font-medium text-gray-800">${detail.product.name}</td>
+                        <td class="py-3 text-center text-gray-600">${detail.quantity}</td>
+                        <td class="py-3 text-right font-medium text-gray-800">Rp ${Number(detail.subtotal).toLocaleString('id-ID')}</td>
+                    </tr>
+                `;
+            });
+
+            // Tampilkan catatan jika ada
+            let noteSection = document.getElementById('modal-note-section');
+            let noteDisplay = document.getElementById('modal-note-display');
+            if (selectedTicket.note && selectedTicket.note.trim() !== '') {
+                noteDisplay.innerText = selectedTicket.note;
+                noteSection.classList.remove('hidden');
+            } else {
+                noteSection.classList.add('hidden');
+            }
+
+            // Tampilkan total harga di modal
+            document.getElementById('modal-total-price').innerText = `Rp ${Number(selectedTicket.total_amount).toLocaleString('id-ID')}`;
+
+            // Buka modal konfirmasi
+            document.getElementById('confirm-modal').classList.remove('hidden');
+            document.getElementById('confirm-modal').classList.add('flex');
+        }
+
+        // Tutup modal konfirmasi
+        function closeConfirmModal() {
+            document.getElementById('confirm-modal').classList.add('hidden');
+        }
+
+        // Proses akhir pembayaran setelah klik "Konfirmasi & Bayar" di modal
+        function processPayment() {
             if (!selectedTicket) return;
 
-            if (confirm(`Selesaikan dan tandai lunas pesanan untuk ${selectedTicket.table_number}?`)) {
-                fetch(`/kasir/openticket/complete/${selectedTicket.id}`, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'X-CSRF-TOKEN': '{{ csrf_token() }}'
-                    }
+            fetch(`/kasir/openticket/complete/${selectedTicket.id}`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                },
+                body: JSON.stringify({
+                    payment_method: selectedPaymentMethod
                 })
-                .then(response => response.json())
-                .then(data => {
-                    if (data.success) {
-                        alert(data.message);
-                        location.reload(); // Muat ulang halaman untuk memperbarui daftar meja
-                    } else {
-                        alert('Gagal: ' + data.message);
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    closeConfirmModal();
+                    
+                    // Otomatis buka tab cetak struk di tab baru
+                    if (selectedTicket.id) {
+                        window.open('/kasir/struk/' + selectedTicket.id, '_blank');
                     }
-                })
-                .catch(err => console.error(err));
-            }
+
+                    // Muat ulang halaman setelah struk terbuka
+                    setTimeout(() => {
+                        location.reload();
+                    }, 500);
+                } else {
+                    alert('Gagal: ' + data.message);
+                }
+            })
+            .catch(err => {
+                console.error(err);
+                alert('Terjadi kesalahan koneksi.');
+            });
         }
     </script>
 </body>
