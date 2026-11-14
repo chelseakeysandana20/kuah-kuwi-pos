@@ -50,18 +50,31 @@
         <!-- Sidebar Kiri -->
         <aside class="w-24 bg-white border-r flex flex-col justify-between py-6 items-center shadow-sm z-0 shrink-0">
             <div class="flex flex-col gap-4 w-full px-3">
-                <div class="flex flex-col items-center justify-center py-4 bg-red-50 text-red-500 rounded-xl cursor-pointer border border-red-100 transition">
-                    <svg class="w-8 h-8 mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2v10z"></path></svg>
-                    <span class="text-xs font-bold">Noodle</span>
-                </div>
-                <div class="flex flex-col items-center justify-center py-4 text-gray-400 hover:text-gray-600 hover:bg-gray-50 rounded-xl cursor-pointer transition">
-                    <svg class="w-8 h-8 mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M5.121 17.804A13.937 13.937 0 0112 16c2.5 0 4.847.655 6.879 1.804M15 10a3 3 0 11-6 0 3 3 0 016 0zm6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
-                    <span class="text-xs font-semibold">Gyoza</span>
-                </div>
-                <div class="flex flex-col items-center justify-center py-4 text-gray-400 hover:text-gray-600 hover:bg-gray-50 rounded-xl cursor-pointer transition">
-                    <svg class="w-8 h-8 mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M20 8h-3V4H3c-.6 0-1 .4-1 1v15c0 .6.4 1 1 1h15c.6 0 1-.4 1-1v-5h2V8zM10 12v3H6v-3h4z"></path></svg>
-                    <span class="text-xs font-semibold">Drink</span>
-                </div>
+            @foreach ($categories as $cat)
+                @php
+                    $isActive = ($categoryId == $cat->id);
+                @endphp
+
+                <a href="{{ route('kasir.index', ['category_id' => $cat->id]) }}" 
+                   class="flex flex-col items-center justify-center p-3 rounded-2xl cursor-pointer transition {{ $isActive ? 'bg-red-50 text-red-600 border border-red-200 shadow-sm' : 'text-gray-400 hover:text-gray-700 hover:bg-gray-50' }}">
+                    
+                    @if (strtolower($cat->name) == 'noodle')
+                        <svg class="w-8 h-8 mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M3 14h18m-9-4v8m-7 0h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"></path>
+                        </svg>
+                    @elseif (strtolower($cat->name) == 'gyoza')
+                        <svg class="w-8 h-8 mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 15.546c-.523 0-1.046.151-1.5.454a2.704 2.704 0 01-3 0 2.704 2.704 0 00-3 0 2.704 2.704 0 01-3 0 2.704 2.704 0 00-3 0 2.704 2.704 0 01-1.5-.454M9 6v2m3-2v2m3-2v2M9 3h6m-7 15h8a2 2 0 002-2V7a2 2 0 00-2-2H8a2 2 0 00-2 2v9a2 2 0 002 2z"></path>
+                        </svg>
+                    @else
+                        <svg class="w-8 h-8 mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path>
+                        </svg>
+                    @endif
+
+                    <span class="text-xs {{ $isActive ? 'font-bold' : 'font-semibold' }}">{{ $cat->name }}</span>
+                </a>
+                @endforeach
             </div>
 
             <div class="flex flex-col gap-3 w-full px-3">
