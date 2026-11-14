@@ -112,12 +112,20 @@
                     
                     <div class="grid grid-cols-3 gap-4">
                         @foreach ($products as $product)
-                        <div onclick="addToCart({{ $product->id }}, '{{ addslashes($product->name) }}', {{ $product->price }})" 
-                             class="bg-white p-6 rounded-xl shadow-sm border-2 border-gray-200 cursor-pointer hover:bg-red-50 hover:border-red-500 hover:text-red-600 transition flex flex-col items-center justify-center h-32 group">
-                            <h3 class="font-bold text-lg text-gray-800 group-hover:text-red-600 text-center">{{ $product->name }}</h3>
-                            <p class="text-sm font-semibold text-gray-400 mt-2">Rp {{ number_format($product->price, 0, ',', '.') }}</p>
-                        </div>
+                            <div onclick="addToCart({{ $product->id }}, '{{ addslashes($product->name) }}', {{ $product->price }})"
+                                data-name="{{ strtolower($product->name) }}"
+                                class="menu-item bg-white p-6 rounded-xl shadow-sm border border-gray-100 hover:border-red-500 cursor-pointer transition group">
+                                <h3 class="font-bold text-lg text-gray-800 group-hover:text-red-600 transition">{{ $product->name }}</h3>
+                                <p class="text-sm font-semibold text-gray-400 mt-1">
+                                    {{ $product->price == 0 ? 'Gratis' : 'Rp ' . number_format($product->price, 0, ',', '.') }}
+                                </p>
+                            </div>
                         @endforeach
+
+                        <!-- Pesan jika menu tidak ditemukan -->
+                        <div id="empty-search-msg" class="hidden col-span-3 text-center py-10 text-gray-400 italic text-sm">
+                            Menu tidak ditemukan.
+                        </div>
                     </div>
                 </div>
 
@@ -543,6 +551,35 @@
     function closeConfirmModal() {
         document.getElementById('confirm-modal').classList.add('hidden');
     }
+
+    // Fitur Pencarian Menu Real-Time
+        const searchInput = document.getElementById('search-menu');
+        if (searchInput) {
+            searchInput.addEventListener('input', function () {
+                const keyword = this.value.toLowerCase().trim();
+                const menuItems = document.querySelectorAll('.menu-item');
+                const emptyMsg = document.getElementById('empty-search-msg');
+                let visibleCount = 0;
+
+                menuItems.forEach(item => {
+                    const menuName = item.getAttribute('data-name') || '';
+                    if (menuName.includes(keyword)) {
+                        item.classList.remove('hidden');
+                        visibleCount++;
+                    } else {
+                        item.classList.add('hidden');
+                    }
+                });
+
+                if (emptyMsg) {
+                    if (visibleCount === 0 && menuItems.length > 0) {
+                        emptyMsg.classList.remove('hidden');
+                    } else {
+                        emptyMsg.classList.add('hidden');
+                    }
+                }
+            });
+        }
     </script>
 </body>
 </html>
