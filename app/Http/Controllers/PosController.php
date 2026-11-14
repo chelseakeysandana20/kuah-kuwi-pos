@@ -13,16 +13,35 @@ use Illuminate\Support\Str;
 
 class PosController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        // Mengambil semua kategori beserta produknya
-        $categories = Category::all();
-        
-        // Mengambil semua produk yang statusnya tersedia (is_available = true)
-        $products = Product::with('category')->where('is_available', true)->get();
+    // Mengambil semua kategori untuk ditampilkan di sidebar
+    $categories = Category::all();
 
-        // Mengirim data ke halaman view kasir/pos.blade.php
-        return view('kasir.pos', compact('categories', 'products'));
+    // Cek apakah ada filter kategori yang diklik (mengambil ID kategori dari URL)
+    $categoryId = $request->get('category_id');
+
+    // Jika kategori dipilih, filter produk berdasarkan category_id tersebut
+    if ($categoryId) {
+        $products = Product::with('category')
+            ->where('is_available', 1)
+            ->where('category_id', $categoryId)
+            ->get();
+    } else {
+        // Default: Jika belum ada yang diklik, ambil kategori pertama (misal: Noodle)
+        $defaultCategory = $categories->first();
+        $categoryId = $defaultCategory ? $defaultCategory->id : null;
+
+        $products = Product::with('category')
+            ->where('is_available', 1)
+            ->when($categoryId, function($query, $categoryId) {
+                return $query->where('category_id', $categoryId);
+            })
+            ->get();
+    }
+
+    // Mengirim data ke view kasir/pos.blade.php
+    return view('kasir.pos', compact('categories', 'products', 'categoryId'));
     }
 
     // Fungsi baru untuk memproses pembayaran dan menyimpan ke database
