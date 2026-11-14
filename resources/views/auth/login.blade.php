@@ -40,8 +40,8 @@
                         class="w-full text-left px-5 py-2.5 rounded-full border border-[#E26D73] text-sm transition flex items-center justify-between bg-white focus:outline-none">
                     <span id="dropdown-label" class="{{ old('username') ? 'text-gray-800 font-semibold' : 'text-gray-400' }}">
                         @if(old('username') === 'owner') Owner
-                        @elseif(old('username') === 'kasir') Cashier
-                        @elseif(old('username') === 'dapur') Kitchen
+                        @elseif(old('username') === 'kasir') Kasir
+                        @elseif(old('username') === 'dapur') Staff Dapur
                         @else chose account
                         @endif
                     </span>
