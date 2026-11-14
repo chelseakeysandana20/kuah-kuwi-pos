@@ -5,6 +5,7 @@ use Illuminate\Support\Facades\Auth;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\PosController;
 use App\Http\Controllers\OwnerController;
+use App\Http\Controllers\StokController;
 
 // Route Publik (Bisa diakses tanpa login)
 Route::get('/', function () {
@@ -50,8 +51,9 @@ Route::middleware('auth')->group(function () {
 
     // Grup Khusus Staff Dapur
     Route::middleware('role:staff_dapur')->prefix('dapur')->group(function () {
-        Route::get('/stok', function () {
-            return 'Halaman Manajemen Stok Bahan Baku';
-        })->name('dapur.stok');
+        Route::get('/stok', [StokController::class, 'index'])->name('dapur.stok');
+        Route::post('/stok', [StokController::class, 'store'])->name('dapur.stok.store');
+        Route::patch('/stok/{id}', [StokController::class, 'updateStock'])->name('dapur.stok.update');
+        Route::get('/stok/export', [StokController::class, 'export'])->name('dapur.stok.export');
     });
 });
