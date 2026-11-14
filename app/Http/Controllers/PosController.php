@@ -10,6 +10,9 @@ use App\Models\Transaction;
 use App\Models\TransactionDetail;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
+use Illuminate\Support\Facades\Schema;
+use Illuminate\Support\Facades\Auth;
+use Carbon\Carbon;
 
 class PosController extends Controller
 {
@@ -39,6 +42,25 @@ class PosController extends Controller
             })
             ->get();
     }
+
+    // Hitung Rekap Penjualan Hari Ini untuk Modal Tutup Kasir
+        $today = Carbon::today();
+        $amountCol = Schema::hasColumn('transactions', 'total_amount') ? 'total_amount'
+                   : (Schema::hasColumn('transactions', 'total_price') ? 'total_price' : 'total');
+
+        $todayTransactions = DB::table('transactions')
+            ->whereDate('created_at', $today)
+            ->where('status', '!=', 'open')
+            ->get();
+
+        $rekapHariIni = [
+            'report_id'       => 'RPT' . $today->format('dmY'),
+            'tanggal'         => $today->translatedFormat('d F Y'),
+            'total_transaksi' => $todayTransactions->count(),
+            'total_income'    => $todayTransactions->sum($amountCol),
+            'total_cash'      => $todayTransactions->filter(fn($t) => strtolower($t->payment_method ?? '') === 'cash')->sum($amountCol),
+            'total_qris'      => $todayTransactions->filter(fn($t) => strtolower($t->payment_method ?? '') === 'qris')->sum($amountCol),
+        ];
 
     // Mengirim data ke view kasir/pos.blade.php
     return view('kasir.pos', compact('categories', 'products', 'categoryId'));
@@ -155,5 +177,67 @@ class PosController extends Controller
                             ->get();
 
         return view('kasir.riwayat', compact('riwayatTransaksi'));
+    }
+
+    public function downloadLaporanTutupKasir()
+    {
+        $today = Carbon::today();
+        $amountCol = Schema::hasColumn('transactions', 'total_amount') ? 'total_amount'
+                   : (Schema::hasColumn('transactions', 'total_price') ? 'total_price' : 'total');
+
+        $transactions = DB::table('transactions')
+            ->whereDate('created_at', $today)
+            ->where('status', '!=', 'open')
+            ->orderBy('created_at', 'asc')
+            ->get();
+
+        $reportId = 'RPT' . $today->format('dmY');
+        $filename = "Laporan-Tutup-Kasir-{$reportId}.csv";
+
+        $headers = [
+            "Content-type"        => "text/csv",
+            "Content-Disposition" => "attachment; filename=$filename",
+            "Pragma"              => "no-cache",
+            "Cache-Control"       => "must-revalidate, post-check=0, pre-check=0",
+            "Expires"             => "0"
+        ];
+
+        $callback = function () use ($transactions, $amountCol, $reportId, $today) {
+            $file = fopen('php://output', 'w');
+            fputcsv($file, ['ID Report', $reportId]);
+            fputcsv($file, ['Tanggal', $today->format('d-m-Y')]);
+            fputcsv($file, ['Total Transaksi', $transactions->count()]);
+            fputcsv($file, ['Total Cash (Rp)', $transactions->filter(fn($t) => strtolower($t->payment_method ?? '') === 'cash')->sum($amountCol)]);
+            fputcsv($file, ['Total QRIS (Rp)', $transactions->filter(fn($t) => strtolower($t->payment_method ?? '') === 'qris')->sum($amountCol)]);
+            fputcsv($file, ['Total Income (Rp)', $transactions->sum($amountCol)]);
+            fputcsv($file, []);
+            fputcsv($file, ['No Nota', 'Jam', 'Meja / Tipe', 'Metode Pembayaran', 'Nominal (Rp)']);
+
+            foreach ($transactions as $trx) {
+                fputcsv($file, [
+                    '#' . $trx->id,
+                    Carbon::parse($trx->created_at)->format('H:i'),
+                    !empty($trx->table_number) ? 'Meja ' . $trx->table_number : 'Bawa Pulang',
+                    strtoupper($trx->payment_method ?? '-'),
+                    $trx->{$amountCol} ?? 0,
+                ]);
+            }
+            fclose($file);
+        };
+
+        return response()->stream($callback, 200, $headers);
+    }
+
+    public function konfirmasiTutupKasir(Request $request)
+    {
+        if ($request->filled('catatan_hari_ini')) {
+            \Log::info('Catatan Tutup Kasir (' . now()->format('Y-m-d') . '): ' . $request->catatan_hari_ini);
+        }
+
+        Auth::logout();
+        $request->session()->invalidate();
+        $request->session()->regenerateToken();
+
+        return redirect()->route('login')->with('status', 'Kasir telah ditutup. Terima kasih atas kerja keras hari ini!');
     }
 }
