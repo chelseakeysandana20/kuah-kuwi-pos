@@ -1,17 +1,24 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Facades\Auth;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\PosController;
-use Illuminate\Support\Facades\Auth;
+use App\Http\Controllers\OwnerController;
 
 // Route Publik (Bisa diakses tanpa login)
 Route::get('/', function () {
-    // Jika kasir sudah login, langsung lempar ke halaman POS
     if (Auth::check()) {
-        return redirect()->route('kasir.index'); // Sesuaikan dengan nama rute pos milikmu
+        $role = Auth::user()->role;
+        if ($role === 'owner') {
+            return redirect()->route('owner.dashboard');
+        }
+        if ($role === 'staff_dapur') {
+            return redirect()->route('dapur.stok');
+        }
+        return redirect()->route('kasir.index');
     }
-    // Jika belum login, barulah tampilkan splash screen
+
     return view('landing');
 });
 
@@ -27,9 +34,8 @@ Route::middleware('auth')->group(function () {
 
     // Grup Khusus Owner
     Route::middleware('role:owner')->prefix('owner')->group(function () {
-        Route::get('/dashboard', function () {
-            return 'Halaman Dashboard Owner (Laporan & Keuangan)';
-        })->name('owner.dashboard');
+        Route::get('/dashboard', [OwnerController::class, 'dashboard'])->name('owner.dashboard');
+        Route::get('/dashboard/export', [OwnerController::class, 'exportLaporan'])->name('owner.export');
     });
 
     // Grup Khusus Kasir
