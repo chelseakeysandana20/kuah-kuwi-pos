@@ -61,13 +61,13 @@
                          class="px-5 py-2.5 text-sm font-medium text-gray-800 hover:bg-red-50 hover:text-[#D21F2B] cursor-pointer border-b border-gray-100 transition">
                         Owner
                     </div>
-                    <div onclick="chooseAccount('kasir', 'Cashier')" 
+                    <div onclick="chooseAccount('kasir', 'Kasir')" 
                          class="px-5 py-2.5 text-sm font-medium text-gray-800 hover:bg-red-50 hover:text-[#D21F2B] cursor-pointer border-b border-gray-100 transition">
-                        Cashier
+                        Kasir
                     </div>
-                    <div onclick="chooseAccount('dapur', 'Kitchen')" 
+                    <div onclick="chooseAccount('dapur', 'Staff Dapur')" 
                          class="px-5 py-2.5 text-sm font-medium text-gray-800 hover:bg-red-50 hover:text-[#D21F2B] cursor-pointer transition">
-                        Kitchen
+                        Staff Dapur
                     </div>
                 </div>
             </div>
