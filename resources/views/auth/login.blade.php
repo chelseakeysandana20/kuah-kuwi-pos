@@ -138,6 +138,15 @@
             passwordInput.type = passwordInput.type === 'password' ? 'text' : 'password';
         }
 
+        //notifikasi setelah tutup kasir
+        setTimeout(function () {
+            const alertBox = document.getElementById('status-alert');
+            if (alertBox) {
+                alertBox.style.opacity = '0';
+                setTimeout(() => alertBox.remove(), 500);
+            }
+        }, 3000);
+
         document.addEventListener('click', function(event) {
             const trigger = document.getElementById('dropdown-trigger');
             const menu = document.getElementById('dropdown-menu');
