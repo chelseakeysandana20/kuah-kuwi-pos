@@ -41,4 +41,14 @@ class AuthController extends Controller
             'username' => 'Username atau password yang Anda masukkan salah.',
         ])->onlyInput('username');
     }
+
+    public function logout(Request $request)
+    {
+        Auth::logout();
+
+        $request->session()->invalidate();
+        $request->session()->regenerateToken();
+
+        return redirect()->route('login')->with('status', 'Anda berhasil keluar dari sistem.');
+    }
 }

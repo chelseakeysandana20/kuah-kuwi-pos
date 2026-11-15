@@ -21,6 +21,11 @@
     <div class="relative z-10 bg-white w-11/12 max-w-[420px] rounded-2xl shadow-xl px-8 py-10 transition-all duration-300">
         <h2 class="text-center text-xl font-bold text-gray-800 mb-8">Login form</h2>
 
+        @if (session('status'))
+            <div class="mb-4 px-4 py-3 rounded-xl bg-green-50 border border-green-200 text-green-700 text-xs font-semibold text-center">
+                {{ session('status') }}
+            </div>
+        @endif
         <form method="POST" action="{{ route('login') }}">
             @csrf
             <input type="hidden" name="username" id="selected-username" value="{{ old('username') }}" required>

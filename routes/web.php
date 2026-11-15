@@ -47,6 +47,8 @@ Route::middleware('auth')->group(function () {
         Route::get('/openticket', [PosController::class, 'openTicket'])->name('kasir.openticket');
         Route::post('/openticket/complete/{id}', [PosController::class, 'completeTicket'])->name('kasir.openticket.complete');
         Route::get('/riwayat', [PosController::class, 'riwayat'])->name('kasir.riwayat');
+        Route::get('/tutup-kasir/download', [PosController::class, 'downloadLaporanTutupKasir'])->name('kasir.tutup.download');
+        Route::post('/tutup-kasir/konfirmasi', [PosController::class, 'konfirmasiTutupKasir'])->name('kasir.tutup.konfirmasi');
     });
 
     // Grup Khusus Staff Dapur
