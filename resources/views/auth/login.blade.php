@@ -19,8 +19,7 @@
 
     <!-- Card Login (Z-Index 10) -->
     <div class="relative z-10 bg-white w-11/12 max-w-[420px] rounded-2xl shadow-xl px-8 py-10 transition-all duration-300">
-        <h2 class="text-center text-xl font-bold text-gray-800 mb-8">Login form</h2>
-
+        <h2 class="text-center text-xl font-bold text-gray-800 mb-8">Masuk ke Sistem</h2>
         @if (session('status'))
             <div id="login-status-alert" class="mb-4 px-4 py-3 rounded-xl bg-green-50 border border-green-200 text-green-700 text-xs font-semibold text-center transition-opacity duration-500">
                 {{ session('status') }}
@@ -47,7 +46,7 @@
                         @if(old('username') === 'owner') Owner
                         @elseif(old('username') === 'kasir') Kasir
                         @elseif(old('username') === 'dapur') Staff Dapur
-                        @else chose account
+                        @else pilih akun
                         @endif
                     </span>
                     <svg id="dropdown-arrow" class="w-4 h-4 text-gray-400 transition-transform duration-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -95,7 +94,7 @@
             <div>
                 <button type="submit" id="btn-submit" {{ old('username') ? '' : 'disabled' }}
                     class="w-full flex justify-center py-2.5 px-4 border border-transparent rounded-full shadow-sm text-sm font-medium text-white {{ old('username') ? 'bg-[#D21F2B] hover:bg-[#b51924] cursor-pointer' : 'bg-[#5a5a5a] cursor-not-allowed' }} transition-colors">
-                    Login
+                    Masuk
                 </button>
             </div>
         </form>
