@@ -126,7 +126,7 @@
             </div>
 
             <!-- Toolbar Pencarian, Filter & Tambah Stok -->
-            <form method="GET" action="{{ route('dapur.stok') }}"
+            <form method="GET" action="{{ route('dapur.stok') }}" autocomplete="off"
                   class="bg-white p-4 rounded-2xl border border-gray-100 shadow-sm mb-6 flex flex-wrap items-center justify-between gap-3">
                 
                 <!-- Input Cari -->
@@ -134,9 +134,11 @@
                     <svg class="w-4 h-4 text-gray-400 absolute left-3.5 top-1/2 -translate-y-1/2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
                     </svg>
-                    <input type="text" name="search" value="{{ request('search') }}"
-                           placeholder="Cari nama bahan, kode SKU"
-                           class="w-full pl-10 pr-4 py-2 rounded-xl bg-gray-100 border-transparent focus:bg-white focus:border-[#D21F2B] focus:outline-none text-xs transition">
+                    <input type="text" id="stock-search-input" name="search" value="{{ request('search') }}"
+                        autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"
+                        onkeyup="filterStockTable()"
+                        placeholder="Cari nama bahan, kode SKU"
+                        class="w-full pl-10 pr-4 py-2 rounded-xl bg-gray-100 border-transparent focus:bg-white focus:border-[#D21F2B] focus:outline-none text-xs transition">
                 </div>
 
                 <!-- Dropdown Kategori -->
@@ -179,12 +181,13 @@
                                 <th class="py-3.5 px-5 text-center">STATUS</th>
                             </tr>
                         </thead>
-                        <tbody class="divide-y divide-gray-200 text-xs font-medium text-gray-800">
-                            @forelse ($ingredients as $index => $item)
-                                <tr class="hover:bg-gray-50 transition">
-                                    <td class="py-3.5 px-4 text-center bg-gray-100/70 font-semibold text-gray-500">
-                                        {{ $loop->iteration }}
-                                    </td>
+                        <tbody id="stock-table-body" class="divide-y divide-gray-200 text-xs font-medium text-gray-800">
+                        @forelse ($ingredients as $index => $item)
+                            <tr class="stock-row hover:bg-gray-50 transition"
+                                data-search="{{ strtolower($item->name . ' ' . ($item->sku ?? '')) }}">
+                                <td class="row-number py-3.5 px-4 text-center bg-gray-100/70 font-semibold text-gray-500">
+                                    {{ $loop->iteration }}
+                                </td>
                                     <td class="py-3.5 px-5">
                                         <div class="font-bold text-gray-900">{{ $item->name }}</div>
                                         @if ($item->sku)
@@ -330,6 +333,30 @@
                 setTimeout(() => alertBox.remove(), 500);
             }
         }, 3000);
+
+        function openAddModal() {
+            document.getElementById('add-stock-modal').classList.remove('hidden');
+        }
+        function closeAddModal() {
+            document.getElementById('add-stock-modal').classList.add('hidden');
+        }
+
+        function filterStockTable() {
+            const keyword = document.getElementById('stock-search-input').value.toLowerCase().trim();
+            const rows = document.querySelectorAll('#stock-table-body .stock-row');
+            let visibleIndex = 1;
+
+            rows.forEach(row => {
+                const text = row.getAttribute('data-search') || '';
+                if (text.includes(keyword)) {
+                    row.style.display = '';
+                    const numCell = row.querySelector('.row-number');
+                    if (numCell) numCell.textContent = visibleIndex++;
+                } else {
+                    row.style.display = 'none';
+                }
+            });
+        }
     </script>
 </body>
 </html>
