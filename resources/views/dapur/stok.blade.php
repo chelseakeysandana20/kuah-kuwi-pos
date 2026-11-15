@@ -323,6 +323,13 @@
         function closeAddModal() {
             document.getElementById('add-stock-modal').classList.add('hidden');
         }
+        setTimeout(function () {
+            const alertBox = document.getElementById('dapur-alert');
+            if (alertBox) {
+                alertBox.style.opacity = '0';
+                setTimeout(() => alertBox.remove(), 500);
+            }
+        }, 3000);
     </script>
 </body>
 </html>

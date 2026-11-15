@@ -22,7 +22,7 @@
         <h2 class="text-center text-xl font-bold text-gray-800 mb-8">Login form</h2>
 
         @if (session('status'))
-            <div class="mb-4 px-4 py-3 rounded-xl bg-green-50 border border-green-200 text-green-700 text-xs font-semibold text-center">
+            <div id="login-status-alert" class="mb-4 px-4 py-3 rounded-xl bg-green-50 border border-green-200 text-green-700 text-xs font-semibold text-center transition-opacity duration-500">
                 {{ session('status') }}
             </div>
         @endif
@@ -139,13 +139,18 @@
         }
 
         //notifikasi setelah tutup kasir
-        setTimeout(function () {
-            const alertBox = document.getElementById('status-alert');
+        document.addEventListener('DOMContentLoaded', function () {
+            const alertBox = document.getElementById('login-status-alert');
             if (alertBox) {
-                alertBox.style.opacity = '0';
-                setTimeout(() => alertBox.remove(), 500);
+                setTimeout(function () {
+                    alertBox.style.opacity = '0';
+                    setTimeout(function () {
+                        alertBox.remove();
+                    }, 500);
+                }, 3000);
             }
-        }, 3000);
+        });
+
 
         document.addEventListener('click', function(event) {
             const trigger = document.getElementById('dropdown-trigger');

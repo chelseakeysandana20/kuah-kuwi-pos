@@ -72,6 +72,23 @@
 
         <!-- Konten Utama -->
         <main class="flex-1 p-8 overflow-y-auto">
+            @if (session('success'))
+                <div id="owner-alert" class="mb-5 px-4 py-3 rounded-xl bg-green-50 border border-green-200 text-green-700 text-xs font-semibold flex items-center justify-between transition-opacity duration-500">
+                    <span>{{ session('success') }}</span>
+                    <button onclick="this.parentElement.remove()" class="text-green-900 font-bold">&times;</button>
+                </div>
+                
+                <script>
+                    setTimeout(function () {
+                        const alertBox = document.getElementById('owner-alert');
+                        if (alertBox) {
+                            alertBox.style.opacity = '0';
+                            setTimeout(() => alertBox.remove(), 500);
+                        }
+                    }, 3000);
+                </script>
+            @endif
+
             <!-- Header Overview & Filter -->
             <div class="flex flex-wrap items-center justify-between gap-4 mb-6">
                 <div>
@@ -325,6 +342,8 @@
                 }
             }
         });
+
+         
     </script>
 </body>
 </html>
