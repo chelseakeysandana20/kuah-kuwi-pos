@@ -376,6 +376,30 @@
             </form>
         </div>
     </div>
+
+    <!-- Custom Toast Notification (kasir.in Theme) -->
+    <div id="custom-toast"
+        class="fixed top-6 left-1/2 -translate-x-1/2 z-[100] hidden items-center gap-3.5 bg-white border-l-4 border-[#D21F2B] shadow-2xl rounded-2xl px-5 py-3.5 min-w-[320px] max-w-md transition-all duration-300 opacity-0 -translate-y-4">
+        <!-- Ikon Peringatan -->
+        <div id="toast-icon-wrapper" class="w-9 h-9 rounded-full bg-red-50 text-[#D21F2B] flex items-center justify-center shrink-0">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2.3" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z" />
+            </svg>
+        </div>
+
+        <!-- Teks Judul & Pesan -->
+        <div class="flex-1">
+            <p id="toast-title" class="text-xs font-extrabold text-gray-900">Perhatian</p>
+            <p id="toast-message" class="text-[11px] font-medium text-gray-600 mt-0.5 leading-snug">
+                Silakan pilih Tipe Pesanan/Meja terlebih dahulu di detail pesanan!
+            </p>
+        </div>
+
+        <!-- Tombol Tutup Manual -->
+        <button type="button" onclick="hideCustomToast()" class="text-gray-400 hover:text-gray-700 text-lg font-bold leading-none px-1">
+            &times;
+        </button>
+    </div>
     <!-- Script JavaScript untuk Keranjang & Jam Real-time -->
     <script>
         // Jam Real-time
@@ -479,7 +503,7 @@
     // Fungsi untuk simpan tiket ke open tiket
     function saveTicket() {
         if (cart.length === 0) {
-            alert('Keranjang masih kosong! Silakan pilih menu terlebih dahulu.');
+            showCustomToast('Keranjang masih kosong! Silakan pilih menu terlebih dahulu.');
             return;
         }
 
@@ -489,7 +513,7 @@
 
         // Validasi wajib memilih meja/tipe pesanan terlebih dahulu
         if (!tableNumber) {
-            alert('Silakan pilih Tipe Pesanan/Meja terlebih dahulu di panel detail pesanan!');
+            showCustomToast('Silakan pilih Tipe Pesanan/Meja terlebih dahulu di panel detail pesanan!');
             if (tableElement) tableElement.focus();
             return;
         }
@@ -517,12 +541,12 @@
                 // TAMPILKAN MODAL SUKSES KUSTOM DI TENGAH LAYAR
                 document.getElementById('success-modal').classList.remove('hidden');
             } else {
-                alert('Gagal menyimpan: ' + data.message);
+                showCustomToast('Gagal menyimpan: ' + data.message);
             }
         })
         .catch(error => {
             console.error('Error detail:', error);
-            alert('Terjadi kesalahan sistem.');
+            showCustomToast('Terjadi kesalahan sistem.');
         });
     }
 
@@ -536,7 +560,7 @@
         // Tambahkan parameter paymentMethod (default 'CASH')
     function processPayment() {
         if (cart.length === 0) {
-            alert('Keranjang masih kosong! Silakan pilih menu terlebih dahulu.');
+            showCustomToast('Keranjang masih kosong! Silakan pilih menu terlebih dahulu.');
             return;
         }
 
@@ -578,18 +602,18 @@
                     window.open('/kasir/struk/' + data.transaction_id, '_blank');
                 }
             } else {
-                alert('Gagal: ' + data.message);
+                showCustomToast('Gagal: ' + data.message);
             }
         })
         .catch(error => {
             console.error('Error detail:', error);
-            alert('Terjadi kesalahan JavaScript: ' + error.message);
+            showCustomToast('Terjadi kesalahan JavaScript: ' + error.message);
         });
     }
 
     function showConfirmModal() {
             if (cart.length === 0) {
-                alert('Keranjang masih kosong! Silakan pilih menu terlebih dahulu.');
+                showCustomToast('Keranjang masih kosong! Silakan pilih menu terlebih dahulu.');
                 return;
             }
 
@@ -601,7 +625,7 @@
 
             if (!selectedTable) {
                 // Hentikan proses jika kasir belum memilih meja/takeaway
-                alert('Silakan pilih Tipe Pesanan/Meja terlebih dahulu di detail pesanan!');
+                showCustomToast('Silakan pilih Tipe Pesanan/Meja terlebih dahulu di detail pesanan!');
                 tableSelect.focus(); // Arahkan fokus kembali ke dropdown
                 return; 
             }
@@ -695,6 +719,53 @@
 
     function closeTutupKasirModal() {
         document.getElementById('tutup-kasir-modal').classList.add('hidden');
+    }
+
+    let toastTimeout;
+
+    function showCustomToast(message, title = 'Perhatian', type = 'warning') {
+        const toast = document.getElementById('custom-toast');
+        const toastTitle = document.getElementById('toast-title');
+        const toastMessage = document.getElementById('toast-message');
+        const iconWrapper = document.getElementById('toast-icon-wrapper');
+
+        toastTitle.textContent = title;
+        toastMessage.textContent = message;
+
+        // Sesuaikan warna aksen jika tipe sukses (hijau) atau peringatan/error (merah)
+        if (type === 'success') {
+            toast.classList.remove('border-[#D21F2B]');
+            toast.classList.add('border-[#1E7E34]');
+            iconWrapper.className = 'w-9 h-9 rounded-full bg-green-50 text-[#1E7E34] flex items-center justify-center shrink-0';
+        } else {
+            toast.classList.remove('border-[#1E7E34]');
+            toast.classList.add('border-[#D21F2B]');
+            iconWrapper.className = 'w-9 h-9 rounded-full bg-red-50 text-[#D21F2B] flex items-center justify-center shrink-0';
+        }
+
+        // Tampilkan dengan animasi turun halus
+        toast.classList.remove('hidden');
+        toast.classList.add('flex');
+        requestAnimationFrame(() => {
+            toast.classList.remove('opacity-0', '-translate-y-4');
+            toast.classList.add('opacity-100', 'translate-y-0');
+        });
+
+        // Otomatis hilang setelah 3 detik
+        clearTimeout(toastTimeout);
+        toastTimeout = setTimeout(() => {
+            hideCustomToast();
+        }, 3000);
+    }
+
+    function hideCustomToast() {
+        const toast = document.getElementById('custom-toast');
+        toast.classList.remove('opacity-100', 'translate-y-0');
+        toast.classList.add('opacity-0', '-translate-y-4');
+        setTimeout(() => {
+            toast.classList.add('hidden');
+            toast.classList.remove('flex');
+        }, 300);
     }
     </script>
 </body>
