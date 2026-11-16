@@ -78,7 +78,7 @@
             </div>
 
             <div class="flex flex-col gap-3 w-full px-3">
-                <button class="w-full bg-gray-400 text-white py-2 rounded-md text-xs font-bold flex flex-col items-center justify-center gap-1 hover:bg-gray-500 transition shadow-sm">
+                <button type="button" onclick="openSettingModal()" class="w-full bg-gray-400 text-white py-2 rounded-md text-xs font-bold flex flex-col items-center justify-center gap-1 hover:bg-gray-500 transition shadow-sm">
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
                     Setting
                 </button>
@@ -388,6 +388,70 @@
         <button type="button" onclick="hideCustomToast()" class="text-gray-400 hover:text-gray-700 text-lg font-bold leading-none px-1">
             &times;
         </button>
+    </div>
+
+    <!-- Modal Pengaturan POS (kasir.in Theme) -->
+    <div id="setting-modal" class="hidden fixed inset-0 z-50 bg-black/50 backdrop-blur-[2px] items-center justify-center p-4">
+        <div class="bg-white w-full max-w-md rounded-2xl shadow-2xl p-6 relative animate-fadeIn">
+            <div class="flex items-center justify-between border-b border-gray-100 pb-3.5 mb-4">
+                <div class="flex items-center gap-2.5">
+                    <div class="w-9 h-9 rounded-xl bg-red-50 text-[#D21F2B] flex items-center justify-center">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                        </svg>
+                    </div>
+                    <div>
+                        <h3 class="text-sm font-extrabold text-gray-900">Pengaturan Kasir</h3>
+                        <p class="text-[11px] text-gray-500">Preferensi operasional POS Kuah Kuwi</p>
+                    </div>
+                </div>
+                <button type="button" onclick="closeSettingModal()" class="text-gray-400 hover:text-gray-700 text-xl font-bold leading-none">&times;</button>
+            </div>
+
+            <!-- Info Akun Kasir -->
+            <div class="bg-gray-50 rounded-xl p-3.5 mb-4 border border-gray-100 text-xs space-y-1.5">
+                <div class="flex justify-between">
+                    <span class="text-gray-500">Kasir Bertugas</span>
+                    <span class="font-bold text-gray-900">{{ Auth::user()->name ?? 'Kasir Kuah Kuwi' }}</span>
+                </div>
+                <div class="flex justify-between">
+                    <span class="text-gray-500">Outlet / Platform</span>
+                    <span class="font-bold text-[#D21F2B]">Kuah Kuwi • kasir.in</span>
+                </div>
+            </div>
+
+            <!-- Opsi Preferensi -->
+            <div class="space-y-3 mb-6">
+                <label class="flex items-center justify-between p-3 rounded-xl border border-gray-200 cursor-pointer hover:bg-gray-50 transition">
+                    <div>
+                        <p class="text-xs font-bold text-gray-800">Otomatis Cetak / Buka Struk</p>
+                        <p class="text-[11px] text-gray-500">Buka tab struk otomatis setelah pembayaran selesai</p>
+                    </div>
+                    <input type="checkbox" id="setting-auto-struk" checked class="w-4 h-4 accent-[#D21F2B] rounded cursor-pointer">
+                </label>
+
+                <label class="flex items-center justify-between p-3 rounded-xl border border-gray-200 cursor-pointer hover:bg-gray-50 transition">
+                    <div>
+                        <p class="text-xs font-bold text-gray-800">Metode Bayar Default</p>
+                        <p class="text-[11px] text-gray-500">Pilihan awal saat membuka transaksi baru</p>
+                    </div>
+                    <select id="setting-default-payment" class="text-xs font-bold text-gray-800 border border-gray-300 rounded-lg px-2.5 py-1.5 focus:outline-none focus:border-[#D21F2B]">
+                        <option value="CASH">CASH</option>
+                        <option value="QRIS">QRIS</option>
+                    </select>
+                </label>
+            </div>
+
+            <div class="flex justify-end gap-2.5">
+                <button type="button" onclick="closeSettingModal()" class="px-4 py-2 rounded-xl border border-gray-300 text-xs font-bold text-gray-700 hover:bg-gray-50 transition">
+                    Batal
+                </button>
+                <button type="button" onclick="savePosSettings()" class="px-5 py-2 rounded-xl bg-[#D21F2B] hover:bg-[#b51924] text-white text-xs font-bold transition shadow-sm">
+                    Simpan Pengaturan
+                </button>
+            </div>
+        </div>
     </div>
     <!-- Script JavaScript untuk Keranjang & Jam Real-time -->
     <script>
@@ -721,7 +785,7 @@
             set('rekap-total-qris', 'Rp ' + Number(data.total_qris || 0).toLocaleString('id-ID'));
         })
         .catch(err => console.error('Gagal fetch rekap:', err));
-}
+    }
 
         function closeTutupKasirModal() {
             const modal = document.getElementById('tutup-kasir-modal');
@@ -778,6 +842,55 @@
             toast.classList.remove('flex');
         }, 300);
     }
+    function openSettingModal() {
+        const modal = document.getElementById('setting-modal');
+        if (!modal) return;
+
+        // Muat preferensi tersimpan dari localStorage
+        const autoStruk = localStorage.getItem('pos_auto_struk');
+        const defaultPay = localStorage.getItem('pos_default_payment') || 'CASH';
+
+        document.getElementById('setting-auto-struk').checked = autoStruk !== 'false';
+        document.getElementById('setting-default-payment').value = defaultPay;
+
+        modal.classList.remove('hidden');
+        modal.classList.add('flex');
+        modal.style.display = 'flex';
+    }
+
+    function closeSettingModal() {
+        const modal = document.getElementById('setting-modal');
+        if (modal) {
+            modal.classList.add('hidden');
+            modal.classList.remove('flex');
+            modal.style.display = 'none';
+        }
+    }
+
+    function savePosSettings() {
+        const autoStruk = document.getElementById('setting-auto-struk').checked;
+        const defaultPay = document.getElementById('setting-default-payment').value;
+
+        localStorage.setItem('pos_auto_struk', autoStruk);
+        localStorage.setItem('pos_default_payment', defaultPay);
+
+        if (typeof selectPayment === 'function') {
+            selectPayment(defaultPay);
+        }
+
+        closeSettingModal();
+        if (typeof showCustomToast === 'function') {
+            showCustomToast('Pengaturan kasir berhasil disimpan!', 'Berhasil', 'success');
+        }
+    }
+
+    // Terapkan metode bayar default saat halaman dimuat
+    document.addEventListener('DOMContentLoaded', () => {
+        const savedPay = localStorage.getItem('pos_default_payment');
+        if (savedPay && typeof selectPayment === 'function') {
+            selectPayment(savedPay);
+        }
+    });
     </script>
 </body>
 </html>
