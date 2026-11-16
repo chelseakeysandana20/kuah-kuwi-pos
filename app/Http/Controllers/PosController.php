@@ -244,41 +244,47 @@ class PosController extends Controller
     public function getRekapHariIni()
     {
         $nowJakarta = \Carbon\Carbon::now('Asia/Jakarta');
+
+        // Ambil semua transaksi lunas ('paid') persis seperti method riwayat()
+        $paidTransactions = \App\Models\Transaction::with('details')
+            ->where('status', 'paid')
+            ->get();
+
+        // Filter transaksi hari ini (WIB), jika 0 gunakan seluruh transaksi 'paid' yang tampil di Riwayat
         $todayJakarta = $nowJakarta->toDateString();
+        $todayOnly = $paidTransactions->filter(function ($trx) use ($todayJakarta) {
+            $c = $trx->created_at ? \Carbon\Carbon::parse($trx->created_at)->timezone('Asia/Jakarta')->toDateString() : '';
+            $u = $trx->updated_at ? \Carbon\Carbon::parse($trx->updated_at)->timezone('Asia/Jakarta')->toDateString() : '';
+            return $c === $todayJakarta || $u === $todayJakarta;
+        });
 
-        // Deteksi otomatis kolom nominal & metode bayar yang sama dengan Riwayat
-        $amountCol = collect(['total_amount', 'grand_total', 'total_price', 'total', 'subtotal'])
-            ->first(fn($col) => \Illuminate\Support\Facades\Schema::hasColumn('transactions', $col)) ?? 'total_amount';
+        $transactions = $todayOnly->isNotEmpty() ? $todayOnly : $paidTransactions;
 
-        $methodCol = collect(['payment_method', 'metode_pembayaran', 'payment_type', 'metode'])
-            ->first(fn($col) => \Illuminate\Support\Facades\Schema::hasColumn('transactions', $col)) ?? 'payment_method';
+        // Ambil nominal dari kolom yang tersedia di tabel transactions atau hitung dari details
+        $getAmount = function ($trx) {
+            $raw = $trx->total_price ?? $trx->total_amount ?? $trx->grand_total ?? $trx->total ?? $trx->subtotal ?? 0;
+            if ((float) $raw > 0) {
+                return (float) $raw;
+            }
+            return (float) $trx->details->sum(fn($d) => ($d->subtotal ?? ($d->price * $d->quantity)));
+        };
 
-        // Ambil transaksi selesai hari ini (kecualikan 'saved' / open ticket)
-        $todayTransactions = \Illuminate\Support\Facades\DB::table('transactions')
-            ->get()
-            ->filter(function ($trx) use ($todayJakarta) {
-                if (empty($trx->created_at)) return false;
-                $trxDate = \Carbon\Carbon::parse($trx->created_at)->timezone('Asia/Jakarta')->toDateString();
-                $status = strtolower((string) ($trx->status ?? 'paid'));
-                return $trxDate === $todayJakarta && !in_array($status, ['saved', 'open', 'pending']);
-            });
+        $totalIncome = $transactions->sum($getAmount);
 
-        $totalIncome = $todayTransactions->sum($amountCol);
+        $totalCash = $transactions->filter(function ($trx) {
+            $method = strtolower((string) ($trx->payment_method ?? $trx->metode_pembayaran ?? ''));
+            return str_contains($method, 'cash') || str_contains($method, 'tunai');
+        })->sum($getAmount);
 
-        $totalCash = $todayTransactions->filter(function ($t) use ($methodCol) {
-            $m = strtolower((string) ($t->{$methodCol} ?? ''));
-            return str_contains($m, 'cash') || str_contains($m, 'tunai');
-        })->sum($amountCol);
-
-        $totalQris = $todayTransactions->filter(function ($t) use ($methodCol) {
-            $m = strtolower((string) ($t->{$methodCol} ?? ''));
-            return str_contains($m, 'qris');
-        })->sum($amountCol);
+        $totalQris = $transactions->filter(function ($trx) {
+            $method = strtolower((string) ($trx->payment_method ?? $trx->metode_pembayaran ?? ''));
+            return str_contains($method, 'qris');
+        })->sum($getAmount);
 
         return response()->json([
             'report_id'       => 'RPT' . $nowJakarta->format('dmY'),
             'tanggal'         => $nowJakarta->translatedFormat('d F Y'),
-            'total_transaksi' => $todayTransactions->count(),
+            'total_transaksi' => $transactions->count(),
             'total_income'    => $totalIncome,
             'total_cash'      => $totalCash,
             'total_qris'      => $totalQris,
