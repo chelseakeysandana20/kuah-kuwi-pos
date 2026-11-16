@@ -271,15 +271,40 @@ class PosController extends Controller
 
         $totalIncome = $transactions->sum($getAmount);
 
-        $totalCash = $transactions->filter(function ($trx) {
-            $method = strtolower((string) ($trx->payment_method ?? $trx->metode_pembayaran ?? ''));
-            return str_contains($method, 'cash') || str_contains($method, 'tunai');
+        // --- BAGIAN YANG DIGANTI MULAI SINI ---
+        $getMethodString = function ($trx) {
+            $direct = $trx->payment_method
+                ?? $trx->metode_pembayaran
+                ?? $trx->payment
+                ?? $trx->method
+                ?? $trx->payment_type
+                ?? $trx->metode
+                ?? $trx->metode_bayar
+                ?? $trx->jenis_pembayaran
+                ?? null;
+
+            if (!empty($direct)) {
+                return strtolower((string) $direct);
+            }
+
+            return strtolower(implode(' ', array_map('strval', array_values($trx->getAttributes()))));
+        };
+
+        $totalCash = $transactions->filter(function ($trx) use ($getMethodString) {
+            $m = $getMethodString($trx);
+            return str_contains($m, 'cash') || str_contains($m, 'tunai');
         })->sum($getAmount);
 
-        $totalQris = $transactions->filter(function ($trx) {
-            $method = strtolower((string) ($trx->payment_method ?? $trx->metode_pembayaran ?? ''));
-            return str_contains($method, 'qris');
+        $totalQris = $transactions->filter(function ($trx) use ($getMethodString) {
+            $m = $getMethodString($trx);
+            return str_contains($m, 'qris');
         })->sum($getAmount);
+
+        $unclassified = $totalIncome - ($totalCash + $totalQris);
+        if ($unclassified > 0) {
+            $totalCash += $unclassified;
+        }
+        // --- BAGIAN YANG DIGANTI SAMPAI SINI ---
 
         return response()->json([
             'report_id'       => 'RPT' . $nowJakarta->format('dmY'),
