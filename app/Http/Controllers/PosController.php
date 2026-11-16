@@ -240,4 +240,48 @@ class PosController extends Controller
 
         return redirect()->route('login')->with('status', 'Kasir telah ditutup. Terima kasih atas kerja keras hari ini!');
     }
+
+    public function getRekapHariIni()
+    {
+        $nowJakarta = \Carbon\Carbon::now('Asia/Jakarta');
+        $todayJakarta = $nowJakarta->toDateString();
+
+        // Deteksi otomatis kolom nominal & metode bayar yang sama dengan Riwayat
+        $amountCol = collect(['total_amount', 'grand_total', 'total_price', 'total', 'subtotal'])
+            ->first(fn($col) => \Illuminate\Support\Facades\Schema::hasColumn('transactions', $col)) ?? 'total_amount';
+
+        $methodCol = collect(['payment_method', 'metode_pembayaran', 'payment_type', 'metode'])
+            ->first(fn($col) => \Illuminate\Support\Facades\Schema::hasColumn('transactions', $col)) ?? 'payment_method';
+
+        // Ambil transaksi selesai hari ini (kecualikan 'saved' / open ticket)
+        $todayTransactions = \Illuminate\Support\Facades\DB::table('transactions')
+            ->get()
+            ->filter(function ($trx) use ($todayJakarta) {
+                if (empty($trx->created_at)) return false;
+                $trxDate = \Carbon\Carbon::parse($trx->created_at)->timezone('Asia/Jakarta')->toDateString();
+                $status = strtolower((string) ($trx->status ?? 'paid'));
+                return $trxDate === $todayJakarta && !in_array($status, ['saved', 'open', 'pending']);
+            });
+
+        $totalIncome = $todayTransactions->sum($amountCol);
+
+        $totalCash = $todayTransactions->filter(function ($t) use ($methodCol) {
+            $m = strtolower((string) ($t->{$methodCol} ?? ''));
+            return str_contains($m, 'cash') || str_contains($m, 'tunai');
+        })->sum($amountCol);
+
+        $totalQris = $todayTransactions->filter(function ($t) use ($methodCol) {
+            $m = strtolower((string) ($t->{$methodCol} ?? ''));
+            return str_contains($m, 'qris');
+        })->sum($amountCol);
+
+        return response()->json([
+            'report_id'       => 'RPT' . $nowJakarta->format('dmY'),
+            'tanggal'         => $nowJakarta->translatedFormat('d F Y'),
+            'total_transaksi' => $todayTransactions->count(),
+            'total_income'    => $totalIncome,
+            'total_cash'      => $totalCash,
+            'total_qris'      => $totalQris,
+        ]);
+    }
 }

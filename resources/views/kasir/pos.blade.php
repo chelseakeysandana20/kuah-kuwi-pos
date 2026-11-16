@@ -268,9 +268,9 @@
     </div>
 
     <!-- Modal Tutup Kasir (Penjualan Hari Ini Selesai) -->
-    <div id="tutup-kasir-modal" class="hidden fixed inset-0 z-50 bg-black/50 backdrop-blur-[2px] flex items-center justify-center p-4">
+    <div id="tutup-kasir-modal" class="hidden fixed inset-0 z-50 bg-black/50 backdrop-blur-[2px] items-center justify-center p-4">
         <div class="bg-white w-full max-w-[660px] rounded-2xl shadow-2xl px-8 py-7 relative animate-fadeIn">
-            
+
             <!-- Header Ikon Centang Kuning & Judul -->
             <div class="text-center mb-5">
                 <div class="w-12 h-12 rounded-full bg-amber-50 border-2 border-[#E5B822] text-[#E5B822] flex items-center justify-center mx-auto mb-3">
@@ -289,91 +289,80 @@
             <div class="bg-[#E5C14A] rounded-xl px-5 py-3.5 flex flex-wrap items-center justify-between gap-4 mb-5 shadow-sm">
                 <div class="text-center">
                     <p class="text-[11px] font-bold text-gray-900">ID report</p>
-                    <p class="text-xs font-medium text-gray-800 mt-0.5">{{ $rekapHariIni['report_id'] ?? 'RPT' . date('dmY') }}</p>
+                    <p id="rekap-report-id" class="text-xs font-medium text-gray-800 mt-0.5">{{ $rekapHariIni['report_id'] ?? 'RPT' . date('dmY') }}</p>
                 </div>
                 <div class="text-center">
                     <p class="text-[11px] font-bold text-gray-900">Tanggal</p>
-                    <p class="text-xs font-medium text-gray-800 mt-0.5">{{ $rekapHariIni['tanggal'] ?? date('d F Y') }}</p>
+                    <p id="rekap-tanggal" class="text-xs font-medium text-gray-800 mt-0.5">{{ $rekapHariIni['tanggal'] ?? date('d F Y') }}</p>
                 </div>
                 <div class="text-center">
                     <p class="text-[11px] font-bold text-gray-900">Total Income</p>
-                    <p class="text-xs font-bold text-gray-900 mt-0.5">Rp{{ number_format($rekapHariIni['total_income'] ?? 0, 0, ',', '.') }}</p>
+                    <p id="rekap-total-income" class="text-xs font-extrabold text-gray-900 mt-0.5">Rp {{ number_format($rekapHariIni['total_income'] ?? 0, 0, ',', '.') }}</p>
                 </div>
-                <div>
-                    <a href="{{ route('kasir.tutup.download') }}"
-                    class="inline-block px-4 py-2 rounded-lg bg-[#1E7E34] hover:bg-[#166327] text-white text-xs font-semibold shadow-sm transition">
-                        Download Report
-                    </a>
-                </div>
+                <a href="{{ route('kasir.tutup.download') }}" class="bg-[#1E7E34] hover:bg-[#176428] text-white text-xs font-bold px-4 py-2 rounded-lg transition shadow-sm">
+                    Download Report
+                </a>
             </div>
 
-            <!-- Form Konfirmasi Tutup Kasir -->
-            <form action="{{ route('kasir.tutup.konfirmasi') }}" method="POST">
-                @csrf
+            <!-- Kotak Rekap Penjualan -->
+            <div class="border border-gray-200 rounded-2xl p-5 mb-6">
+                <h3 class="text-sm font-extrabold text-gray-900 mb-3.5">Rekap Penjualan</h3>
 
-                <!-- Kotak Rekap Penjualan -->
-                <div class="border border-gray-300 rounded-2xl p-5 shadow-sm bg-white mb-6">
-                    <h3 class="text-sm font-bold text-gray-900 mb-4">Rekap Penjualan</h3>
+                <div class="space-y-2.5 text-xs">
+                    <div class="flex items-center justify-between">
+                        <span class="text-gray-600 font-medium">Status Toko</span>
+                        <span class="font-bold text-gray-900 flex items-center gap-1.5">
+                            Selesai / Tutup Warung
+                            <span class="w-2.5 h-2.5 rounded-full bg-[#1E7E34] inline-block"></span>
+                        </span>
+                    </div>
 
-                    <div class="space-y-2.5 text-xs">
-                        <div class="flex items-center justify-between">
-                            <span class="font-semibold text-gray-700">Status Toko</span>
-                            <span class="font-bold text-gray-800 flex items-center gap-2">
-                                Selesai / Tutup Warung
-                                <span class="w-3 h-3 rounded-full bg-[#1E7E34] inline-block"></span>
-                            </span>
-                        </div>
+                    <div class="flex items-center justify-between">
+                        <span class="text-gray-600 font-medium">Total Transaksi</span>
+                        <span id="rekap-total-transaksi" class="font-bold text-gray-900">{{ $rekapHariIni['total_transaksi'] ?? 0 }} Transaksi</span>
+                    </div>
 
-                        <div class="flex items-center justify-between">
-                            <span class="font-semibold text-gray-700">Total Transaksi</span>
-                            <span class="font-bold text-gray-800">{{ $rekapHariIni['total_transaksi'] ?? 0 }} Transaksi</span>
-                        </div>
-
-                        <div class="pt-1">
-                            <p class="font-semibold text-gray-700 mb-2">Rincian Pendapatan</p>
-                            <div class="space-y-1.5 pl-1">
-                                <div class="flex items-center justify-between">
-                                    <span class="flex items-center gap-2 text-gray-700 font-medium">
-                                        <span class="px-1.5 py-0.5 rounded bg-amber-100 text-amber-700 text-[10px] font-bold">💵</span>
-                                        Pendapatan Cash
-                                    </span>
-                                    <span class="font-bold text-gray-900">Rp{{ number_format($rekapHariIni['total_cash'] ?? 0, 0, ',', '.') }}</span>
-                                </div>
-
-                                <div class="flex items-center justify-between">
-                                    <span class="flex items-center gap-2 text-gray-700 font-medium">
-                                        <span class="px-1.5 py-0.5 rounded bg-amber-100 text-amber-700 text-[10px] font-bold">📱</span>
-                                        Pendapatan QRIS
-                                    </span>
-                                    <span class="font-bold text-gray-900">Rp.{{ number_format($rekapHariIni['total_qris'] ?? 0, 0, ',', '.') }}</span>
-                                </div>
+                    <div class="pt-1">
+                        <p class="text-gray-600 font-medium mb-2">Rincian Pendapatan</p>
+                        <div class="space-y-2 pl-1">
+                            <div class="flex items-center justify-between">
+                                <span class="flex items-center gap-2 text-gray-700 font-medium">
+                                    <span class="w-5 h-5 rounded bg-green-100 text-green-700 flex items-center justify-center text-[11px]">💵</span>
+                                    Pendapatan Cash
+                                </span>
+                                <span id="rekap-total-cash" class="font-bold text-gray-900">Rp {{ number_format($rekapHariIni['total_cash'] ?? 0, 0, ',', '.') }}</span>
                             </div>
-                        </div>
 
-                        <!-- Fieldset Catatan Hari Ini -->
-                        <div class="pt-3">
-                            <fieldset class="border border-gray-400 rounded-xl px-3.5 pb-2.5 pt-1">
-                                <legend class="text-[11px] font-semibold text-gray-700 px-1.5">Catatan Hari Ini</legend>
-                                <textarea name="catatan_hari_ini" rows="3"
-                                        placeholder="Tulis catatan operasional, kendala, atau keterangan selisih kas hari ini (opsional)..."
-                                        class="w-full text-xs text-gray-800 focus:outline-none resize-none bg-transparent"></textarea>
-                            </fieldset>
+                            <div class="flex items-center justify-between">
+                                <span class="flex items-center gap-2 text-gray-700 font-medium">
+                                    <span class="w-5 h-5 rounded bg-amber-100 text-amber-700 flex items-center justify-center text-[11px]">📱</span>
+                                    Pendapatan QRIS
+                                </span>
+                                <span id="rekap-total-qris" class="font-bold text-gray-900">Rp {{ number_format($rekapHariIni['total_qris'] ?? 0, 0, ',', '.') }}</span>
+                            </div>
                         </div>
                     </div>
                 </div>
 
-                <!-- 2 Tombol Aksi Bawah -->
-                <div class="flex items-center justify-center gap-4">
-                    <button type="button" onclick="closeTutupKasirModal()"
-                            class="px-7 py-2.5 rounded-xl border border-[#E5C14A] bg-white hover:bg-amber-50 text-gray-800 font-bold text-xs transition">
-                        Batal Tutup Kasir
-                    </button>
-                    <button type="submit"
-                            class="px-7 py-2.5 rounded-xl bg-[#E5C14A] hover:bg-[#d6b13a] text-gray-900 font-bold text-xs shadow-sm transition">
+                <!-- Catatan Hari Ini -->
+                <div class="mt-4 relative">
+                    <label class="absolute -top-2 left-3 bg-white px-1 text-[10px] font-bold text-gray-500">Catatan Hari Ini</label>
+                    <textarea id="catatan-tutup-kasir" rows="2" placeholder="Tulis catatan operasional, kendala, atau keterangan selisih kas hari ini (opsional)..." class="w-full border border-gray-300 rounded-xl px-3.5 py-2.5 text-xs text-gray-700 focus:outline-none focus:border-[#E5C14A] resize-none"></textarea>
+                </div>
+            </div>
+
+            <!-- Tombol Aksi Bawah -->
+            <div class="flex items-center justify-center gap-3">
+                <button type="button" onclick="closeTutupKasirModal()" class="px-6 py-2.5 rounded-xl border border-[#E5C14A] text-gray-800 text-xs font-bold hover:bg-amber-50 transition">
+                    Batal Tutup Kasir
+                </button>
+                <form action="{{ route('kasir.tutup.konfirmasi') }}" method="POST" class="inline">
+                    @csrf
+                    <button type="submit" class="px-6 py-2.5 rounded-xl bg-[#E5C14A] hover:bg-[#d6b13a] text-gray-900 text-xs font-extrabold transition shadow-sm">
                         Konfirmasi Tutup Kasir
                     </button>
-                </div>
-            </form>
+                </form>
+            </div>
         </div>
     </div>
 
@@ -712,14 +701,36 @@
             });
         }
 
-    // Fitur tutup kasir
     function openTutupKasirModal() {
-        document.getElementById('tutup-kasir-modal').classList.remove('hidden');
-    }
+    const modal = document.getElementById('tutup-kasir-modal');
+    if (!modal) return;
 
-    function closeTutupKasirModal() {
-        document.getElementById('tutup-kasir-modal').classList.add('hidden');
-    }
+    modal.classList.remove('hidden');
+    modal.classList.add('flex');
+    modal.style.display = 'flex';
+
+    fetch('/kasir/rekap-hari-ini')
+        .then(res => res.json())
+        .then(data => {
+            const set = (id, val) => { const el = document.getElementById(id); if (el) el.textContent = val; };
+            set('rekap-report-id', data.report_id);
+            set('rekap-tanggal', data.tanggal);
+            set('rekap-total-income', 'Rp ' + Number(data.total_income || 0).toLocaleString('id-ID'));
+            set('rekap-total-transaksi', (data.total_transaksi || 0) + ' Transaksi');
+            set('rekap-total-cash', 'Rp ' + Number(data.total_cash || 0).toLocaleString('id-ID'));
+            set('rekap-total-qris', 'Rp ' + Number(data.total_qris || 0).toLocaleString('id-ID'));
+        })
+        .catch(err => console.error('Gagal fetch rekap:', err));
+}
+
+        function closeTutupKasirModal() {
+            const modal = document.getElementById('tutup-kasir-modal');
+            if (modal) {
+                modal.classList.add('hidden');
+                modal.classList.remove('flex');
+                modal.style.display = 'none';
+            }
+        }
 
     let toastTimeout;
 

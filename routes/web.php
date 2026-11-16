@@ -49,6 +49,7 @@ Route::middleware('auth')->group(function () {
         Route::get('/riwayat', [PosController::class, 'riwayat'])->name('kasir.riwayat');
         Route::get('/tutup-kasir/download', [PosController::class, 'downloadLaporanTutupKasir'])->name('kasir.tutup.download');
         Route::post('/tutup-kasir/konfirmasi', [PosController::class, 'konfirmasiTutupKasir'])->name('kasir.tutup.konfirmasi');
+        Route::get('/kasir/rekap-hari-ini', [PosController::class, 'getRekapHariIni'])->name('kasir.rekap');
     });
 
     // Grup Khusus Staff Dapur
