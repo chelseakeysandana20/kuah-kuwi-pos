@@ -46,7 +46,31 @@
         
         <!-- Area Utama Tabel Riwayat -->
         <main class="flex-1 p-6 overflow-y-auto">
-            <h2 class="text-xl font-bold text-gray-800 mb-6">RIWAYAT PESANAN</h2>
+            <div class="flex flex-wrap items-center justify-between gap-4 mb-6">
+                <div>
+                    <h2 class="text-xl font-bold text-gray-800">RIWAYAT PESANAN</h2>
+                    <p class="text-xs text-gray-500 mt-0.5">Arsip transaksi tersimpan permanen lintas bulan</p>
+                </div>
+
+                <!-- Filter Rentang Tanggal & Pencarian Nota -->
+                <form method="GET" action="{{ route('kasir.riwayat') }}" class="flex flex-wrap items-center gap-2">
+                    <input type="text" name="search" value="{{ request('search') }}" placeholder="Cari nota / meja..."
+                        class="text-xs border border-gray-300 rounded-lg px-3 py-2 bg-white focus:outline-none focus:border-red-500">
+                    <input type="date" name="start_date" value="{{ request('start_date') }}" title="Dari Tanggal"
+                        class="text-xs border border-gray-300 rounded-lg px-3 py-2 bg-white focus:outline-none focus:border-red-500">
+                    <span class="text-xs text-gray-400">s/d</span>
+                    <input type="date" name="end_date" value="{{ request('end_date') }}" title="Sampai Tanggal"
+                        class="text-xs border border-gray-300 rounded-lg px-3 py-2 bg-white focus:outline-none focus:border-red-500">
+                    <button type="submit" class="bg-red-600 hover:bg-red-700 text-white text-xs font-bold px-4 py-2 rounded-lg transition shadow-sm">
+                        Filter
+                    </button>
+                    @if(request()->hasAny(['search', 'start_date', 'end_date']))
+                        <a href="{{ route('kasir.riwayat') }}" class="text-xs text-gray-500 hover:text-gray-800 px-2 py-2 font-semibold">
+                            Reset
+                        </a>
+                    @endif
+                </form>
+            </div>
 
             <div class="bg-white rounded-2xl shadow-sm border border-gray-200 overflow-hidden">
                 <table class="w-full text-left border-collapse">
@@ -73,7 +97,7 @@
                                 </span>
                             </td>
                             <td class="py-4 px-6 text-center">
-                                <button onclick="showDetail({{ json_encode($trx) }})" class="bg-white border border-gray-300 hover:bg-gray-100 text-gray-700 text-xs font-semibold px-3 py-1.5 rounded-lg shadow-sm transition">
+                                <button type="button" onclick='showDetail(@json($trx))' class="bg-white border border-gray-300 hover:bg-gray-100 text-gray-700 text-xs font-semibold px-3 py-1.5 rounded-lg shadow-sm transition">
                                     Lihat Detail
                                 </button>
                             </td>
@@ -81,12 +105,17 @@
                         @empty
                         <tr>
                             <td colspan="6" class="text-center py-12 text-gray-400 italic">
-                                Belum ada riwayat transaksi yang selesai.
+                                Belum ada riwayat transaksi yang sesuai.
                             </td>
                         </tr>
                         @endforelse
                     </tbody>
                 </table>
+            </div>
+
+            <!-- Navigasi Halaman (Pagination untuk ribuan transaksi lintas bulan) -->
+            <div class="mt-4">
+                {{ $riwayatTransaksi->links() }}
             </div>
         </main>
 
@@ -126,17 +155,26 @@
             let container = document.getElementById('detail-items-container');
             container.innerHTML = '';
 
-            trx.details.forEach(detail => {
-                container.innerHTML += `
-                    <div class="flex justify-between items-start border-b border-gray-100 pb-3">
-                        <div>
-                            <h4 class="font-bold text-sm text-gray-800">${detail.product.name} x${detail.quantity}</h4>
-                            <p class="text-xs text-gray-400 mt-0.5">Harga: Rp ${Number(detail.price).toLocaleString('id-ID')}</p>
+            if (!trx.details || trx.details.length === 0) {
+                container.innerHTML = `<div class="text-gray-400 text-center py-10 text-sm italic">Tidak ada item pada transaksi ini.</div>`;
+            } else {
+                trx.details.forEach(detail => {
+                    const productName = detail.product ? detail.product.name : (detail.product_name || 'Menu Terhapus');
+                    const qty = detail.quantity ?? 1;
+                    const price = Number(detail.price ?? 0);
+                    const subtotal = Number(detail.subtotal ?? (price * qty));
+
+                    container.innerHTML += `
+                        <div class="flex justify-between items-start border-b border-gray-100 pb-3">
+                            <div>
+                                <h4 class="font-bold text-sm text-gray-800">${productName} x${qty}</h4>
+                                <p class="text-xs text-gray-400 mt-0.5">Harga: Rp ${price.toLocaleString('id-ID')}</p>
+                            </div>
+                            <span class="font-semibold text-sm text-gray-800">Rp ${subtotal.toLocaleString('id-ID')}</span>
                         </div>
-                        <span class="font-semibold text-sm text-gray-800">Rp ${Number(detail.subtotal).toLocaleString('id-ID')}</span>
-                    </div>
-                `;
-            });
+                    `;
+                });
+            }
 
             // Tampilkan subtotal dan total
             document.getElementById('detail-subtotal').innerText = `Rp ${Number(trx.total_amount).toLocaleString('id-ID')}`;

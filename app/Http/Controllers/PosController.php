@@ -168,13 +168,30 @@ class PosController extends Controller
         }
     }
 
-    public function riwayat()
+    public function riwayat(Request $request)
     {
-        // Ambil semua transaksi yang sudah lunas (paid) beserta detail produknya
-        $riwayatTransaksi = Transaction::with('details.product')
-                            ->where('status', 'paid')
-                            ->latest()
-                            ->get();
+        $query = \App\Models\Transaction::with('details.product')
+            ->where('status', 'paid')
+            ->orderBy('created_at', 'desc');
+
+        // Filter rentang tanggal bebas (lintas bulan / tahun)
+        if ($request->filled('start_date')) {
+            $query->whereDate('created_at', '>=', $request->start_date);
+        }
+        if ($request->filled('end_date')) {
+            $query->whereDate('created_at', '<=', $request->end_date);
+        }
+
+        // Pencarian kode nota atau nomor meja
+        if ($request->filled('search')) {
+            $search = $request->search;
+            $query->where(function ($q) use ($search) {
+                $q->where('receipt_number', 'like', "%{$search}%")
+                  ->orWhere('table_number', 'like', "%{$search}%");
+            });
+        }
+
+        $riwayatTransaksi = $query->paginate(20)->withQueryString();
 
         return view('kasir.riwayat', compact('riwayatTransaksi'));
     }
