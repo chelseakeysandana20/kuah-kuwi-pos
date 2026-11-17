@@ -48,8 +48,7 @@
         <main class="flex-1 p-6 overflow-y-auto">
             <div class="flex flex-wrap items-center justify-between gap-4 mb-6">
                 <div>
-                    <h2 class="text-xl font-bold text-gray-800">RIWAYAT PESANAN</h2>
-                    <p class="text-xs text-gray-500 mt-0.5">Arsip transaksi tersimpan permanen lintas bulan</p>
+                    <h2 class="text-xl font-bold text-gray-800">Daftar Riwayat Pesanan</h2>
                 </div>
 
                 <!-- Filter Rentang Tanggal & Pencarian Nota -->
