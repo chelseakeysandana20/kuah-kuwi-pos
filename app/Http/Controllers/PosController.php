@@ -182,12 +182,15 @@ class PosController extends Controller
             $query->whereDate('created_at', '<=', $request->end_date);
         }
 
-        // Pencarian kode nota atau nomor meja
+        // Pencarian kode nota, nomor meja, atau nama menu yang dipesan
         if ($request->filled('search')) {
-            $search = $request->search;
+            $search = trim($request->search);
             $query->where(function ($q) use ($search) {
                 $q->where('receipt_number', 'like', "%{$search}%")
-                  ->orWhere('table_number', 'like', "%{$search}%");
+                  ->orWhere('table_number', 'like', "%{$search}%")
+                  ->orWhereHas('details.product', function ($pq) use ($search) {
+                      $pq->where('name', 'like', "%{$search}%");
+                  });
             });
         }
 

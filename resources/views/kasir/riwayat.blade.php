@@ -53,8 +53,8 @@
 
                 <!-- Filter Rentang Tanggal & Pencarian Nota -->
                 <form method="GET" action="{{ route('kasir.riwayat') }}" class="flex flex-wrap items-center gap-2">
-                    <input type="text" name="search" value="{{ request('search') }}" placeholder="Cari nota / meja..."
-                        class="text-xs border border-gray-300 rounded-lg px-3 py-2 bg-white focus:outline-none focus:border-red-500">
+                    <input type="text" name="search" value="{{ request('search') }}" placeholder="Cari nota, meja, atau nama menu..."
+                        class="text-xs border border-gray-300 rounded-lg px-3 py-2 w-56 bg-white focus:outline-none focus:border-red-500">>
                     <input type="date" name="start_date" value="{{ request('start_date') }}" title="Dari Tanggal"
                         class="text-xs border border-gray-300 rounded-lg px-3 py-2 bg-white focus:outline-none focus:border-red-500">
                     <span class="text-xs text-gray-400">s/d</span>
