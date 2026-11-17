@@ -46,7 +46,7 @@
         
         <!-- Area Utama Tabel Riwayat -->
         <main class="flex-1 p-6 overflow-y-auto">
-            <div class="flex flex-wrap items-center justify-between gap-4 mb-6">
+            <div class="flex flex-col items-start gap-3 mb-5">
                 <div>
                     <h2 class="text-xl font-bold text-gray-800">Daftar Riwayat Pesanan</h2>
                 </div>
