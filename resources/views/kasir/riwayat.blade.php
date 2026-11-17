@@ -51,24 +51,35 @@
                     <h2 class="text-xl font-bold text-gray-800">Daftar Riwayat Pesanan</h2>
                 </div>
 
-                <!-- Filter Rentang Tanggal & Pencarian Nota -->
-                <form method="GET" action="{{ route('kasir.riwayat') }}" class="flex flex-wrap items-center gap-2">
+                <!-- Filter Bulan & Pencarian Nota -->
+            <form method="GET" action="{{ route('kasir.riwayat') }}" class="w-full bg-white p-3 rounded-xl border border-gray-200 shadow-sm flex flex-wrap items-center justify-between gap-3">
+                <!-- Input Pencarian dengan Ikon Kaca Pembesar -->
+                <div class="relative flex-1 min-w-[240px]">
+                    <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none">
+                        <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-4.35-4.35m0 0A7.5 7.5 0 103.5 10.5a7.5 7.5 0 0013.15 6.15z" />
+                        </svg>
+                    </div>
                     <input type="text" name="search" value="{{ request('search') }}" placeholder="Cari nota, meja, atau nama menu..."
-                        class="text-xs border border-gray-300 rounded-lg px-3 py-2 w-56 bg-white focus:outline-none focus:border-red-500">>
-                    <input type="date" name="start_date" value="{{ request('start_date') }}" title="Dari Tanggal"
-                        class="text-xs border border-gray-300 rounded-lg px-3 py-2 bg-white focus:outline-none focus:border-red-500">
-                    <span class="text-xs text-gray-400">s/d</span>
-                    <input type="date" name="end_date" value="{{ request('end_date') }}" title="Sampai Tanggal"
-                        class="text-xs border border-gray-300 rounded-lg px-3 py-2 bg-white focus:outline-none focus:border-red-500">
+                        class="w-full text-xs border border-gray-200 bg-gray-50 focus:bg-white rounded-lg pl-10 pr-3.5 py-2 text-gray-800 focus:outline-none focus:border-red-500 transition">
+                </div>
+
+                <!-- Pemilih Bulan & Tombol Aksi -->
+                <div class="flex items-center gap-2">
+                    <input type="month" name="month" value="{{ request('month') }}" title="Pilih Bulan Riwayat"
+                        class="text-xs border border-gray-200 bg-gray-50 focus:bg-white rounded-lg px-3 py-2 text-gray-700 focus:outline-none focus:border-red-500 transition">
+
                     <button type="submit" class="bg-red-600 hover:bg-red-700 text-white text-xs font-bold px-4 py-2 rounded-lg transition shadow-sm">
                         Filter
                     </button>
-                    @if(request()->hasAny(['search', 'start_date', 'end_date']))
-                        <a href="{{ route('kasir.riwayat') }}" class="text-xs text-gray-500 hover:text-gray-800 px-2 py-2 font-semibold">
+
+                    @if(request()->hasAny(['search', 'month']))
+                        <a href="{{ route('kasir.riwayat') }}" class="bg-gray-100 hover:bg-gray-200 text-gray-700 text-xs font-semibold px-3.5 py-2 rounded-lg border border-gray-200 transition">
                             Reset
                         </a>
                     @endif
-                </form>
+                </div>
+            </form>
             </div>
 
             <div class="bg-white rounded-2xl shadow-sm border border-gray-200 overflow-hidden">

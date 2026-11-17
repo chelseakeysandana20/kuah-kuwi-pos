@@ -174,15 +174,14 @@ class PosController extends Controller
             ->where('status', 'paid')
             ->orderBy('created_at', 'desc');
 
-        // Filter rentang tanggal bebas (lintas bulan / tahun)
-        if ($request->filled('start_date')) {
-            $query->whereDate('created_at', '>=', $request->start_date);
-        }
-        if ($request->filled('end_date')) {
-            $query->whereDate('created_at', '<=', $request->end_date);
+        // Filter berdasarkan bulan & tahun (format YYYY-MM dari input type="month")
+        if ($request->filled('month')) {
+            [$year, $month] = explode('-', $request->month);
+            $query->whereYear('created_at', $year)
+                  ->whereMonth('created_at', $month);
         }
 
-        // Pencarian kode nota, nomor meja, atau nama menu yang dipesan
+        // Pencarian kode nota, nomor meja, atau nama menu
         if ($request->filled('search')) {
             $search = trim($request->search);
             $query->where(function ($q) use ($search) {
