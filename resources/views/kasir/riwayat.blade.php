@@ -73,7 +73,7 @@
                         Filter
                     </button>
 
-                    @if(request()->hasAny(['search', 'month']))
+                    @if(request()->hasAny(['kf', 'month']))
                         <a href="{{ route('kasir.riwayat') }}" class="bg-gray-100 hover:bg-gray-200 text-gray-700 text-xs font-semibold px-3.5 py-2 rounded-lg border border-gray-200 transition">
                             Reset
                         </a>

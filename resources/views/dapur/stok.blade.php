@@ -48,13 +48,12 @@
                     <span>Dashboard</span>
                 </a>
 
-                <a href="#" onclick="alert('Pengaturan batas minimum stok tersedia pada setiap item.')"
-                   class="flex items-center gap-3 px-4 py-3 rounded-full text-gray-300 hover:text-white hover:bg-white/10 font-medium text-sm transition">
-                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                <a href="javascript:void(0)" onclick="openDapurSettingModal()" class="flex items-center gap-3 px-4 py-3 rounded-xl text-white/80 hover:bg-white/10 hover:text-white transition text-sm font-medium">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
                     </svg>
-                    <span>Setting</span>
+                    Setting
                 </a>
             </nav>
 
@@ -319,6 +318,96 @@
         </div>
     </div>
 
+    <!-- Modal Pengaturan Staff Dapur (kasir.in Theme) -->
+    <div id="dapur-setting-modal" class="hidden fixed inset-0 z-50 bg-black/50 backdrop-blur-[2px] items-center justify-center p-4">
+        <div class="bg-white w-full max-w-md rounded-2xl shadow-2xl p-6 relative">
+            <!-- Header Modal -->
+            <div class="flex items-center justify-between border-b border-gray-100 pb-3.5 mb-4">
+                <div class="flex items-center gap-2.5">
+                    <div class="w-9 h-9 rounded-xl bg-red-50 text-[#D21F2B] flex items-center justify-center">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                        </svg>
+                    </div>
+                    <div>
+                        <h3 class="text-sm font-extrabold text-gray-900">Pengaturan Staff Dapur</h3>
+                        <p class="text-[11px] text-gray-500">Preferensi manajemen stok & inventaris Kuah Kuwi</p>
+                    </div>
+                </div>
+                <button type="button" onclick="closeDapurSettingModal()" class="text-gray-400 hover:text-gray-700 text-xl font-bold leading-none">&times;</button>
+            </div>
+
+            <!-- Info Akun Staff Dapur -->
+            <div class="bg-gray-50 rounded-xl p-3.5 mb-4 border border-gray-100 text-xs space-y-1.5">
+                <div class="flex justify-between">
+                    <span class="text-gray-500">Petugas Dapur</span>
+                    <span class="font-bold text-gray-900">{{ Auth::user()->name ?? 'Staff Dapur' }}</span>
+                </div>
+                <div class="flex justify-between">
+                    <span class="text-gray-500">Divisi / Outlet</span>
+                    <span class="font-bold text-[#D21F2B]">Dapur & Gudang • Kuah Kuwi</span>
+                </div>
+            </div>
+
+            <!-- Opsi Preferensi Operasional Dapur -->
+            <div class="space-y-3 mb-6">
+                <label class="flex items-center justify-between p-3 rounded-xl border border-gray-200 cursor-pointer hover:bg-gray-50 transition">
+                    <div>
+                        <p class="text-xs font-bold text-gray-800">Batas Default Stok Menipis</p>
+                        <p class="text-[11px] text-gray-500">Nilai acuan awal saat menambah bahan baku baru</p>
+                    </div>
+                    <div class="flex items-center gap-1.5">
+                        <input type="number" id="dapur-min-stock" min="1" max="100" value="5"
+                            class="w-16 text-center text-xs font-bold text-gray-800 border border-gray-300 rounded-lg px-2 py-1.5 focus:outline-none focus:border-[#D21F2B]">
+                        <span class="text-[11px] text-gray-400 font-semibold">item</span>
+                    </div>
+                </label>
+
+                <label class="flex items-center justify-between p-3 rounded-xl border border-gray-200 cursor-pointer hover:bg-gray-50 transition">
+                    <div>
+                        <p class="text-xs font-bold text-gray-800">Peringatan Otomatis Stok Kritis</p>
+                        <p class="text-[11px] text-gray-500">Tampilkan notifikasi jika ada bahan menipis / habis</p>
+                    </div>
+                    <input type="checkbox" id="dapur-low-alert" checked class="w-4 h-4 accent-[#D21F2B] rounded cursor-pointer">
+                </label>
+
+                <label class="flex items-center justify-between p-3 rounded-xl border border-gray-200 cursor-pointer hover:bg-gray-50 transition">
+                    <div>
+                        <p class="text-xs font-bold text-gray-800">Satuan Bahan Default</p>
+                        <p class="text-[11px] text-gray-500">Satuan otomatis saat input item bahan baru</p>
+                    </div>
+                    <select id="dapur-default-unit" class="text-xs font-bold text-gray-800 border border-gray-300 rounded-lg px-2.5 py-1.5 focus:outline-none focus:border-[#D21F2B]">
+                        <option value="kg">kg</option>
+                        <option value="gram">gram</option>
+                        <option value="bungkus">bungkus</option>
+                        <option value="pcs">pcs</option>
+                        <option value="liter">liter</option>
+                    </select>
+                </label>
+            </div>
+
+            <!-- Tombol Aksi -->
+            <div class="flex justify-end gap-2.5">
+                <button type="button" onclick="closeDapurSettingModal()" class="px-4 py-2 rounded-xl border border-gray-300 text-xs font-bold text-gray-700 hover:bg-gray-50 transition">
+                    Batal
+                </button>
+                <button type="button" onclick="saveDapurSettings()" class="px-5 py-2 rounded-xl bg-[#D21F2B] hover:bg-[#b51924] text-white text-xs font-bold transition shadow-sm">
+                    Simpan Pengaturan
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast Notifikasi Dapur -->
+    <div id="dapur-toast" class="hidden fixed top-5 right-5 z-[60] bg-white border-l-4 border-emerald-500 shadow-xl rounded-xl px-4 py-3 flex items-center gap-3">
+        <div class="w-7 h-7 rounded-full bg-emerald-100 text-emerald-600 flex items-center justify-center font-bold text-xs">✓</div>
+        <div>
+            <p class="text-xs font-extrabold text-gray-900">Berhasil</p>
+            <p id="dapur-toast-msg" class="text-[11px] text-gray-600">Pengaturan staff dapur berhasil disimpan!</p>
+        </div>
+    </div>
+
     <script>
         function openAddModal() {
             document.getElementById('add-stock-modal').classList.remove('hidden');
@@ -356,6 +445,44 @@
                     row.style.display = 'none';
                 }
             });
+        }
+
+        function openDapurSettingModal() {
+        const modal = document.getElementById('dapur-setting-modal');
+        if (!modal) return;
+
+        document.getElementById('dapur-min-stock').value = localStorage.getItem('dapur_min_stock') || '5';
+        document.getElementById('dapur-low-alert').checked = localStorage.getItem('dapur_low_alert') !== 'false';
+        document.getElementById('dapur-default-unit').value = localStorage.getItem('dapur_default_unit') || 'kg';
+
+        modal.classList.remove('hidden');
+        modal.classList.add('flex');
+        }
+
+        function closeDapurSettingModal() {
+            const modal = document.getElementById('dapur-setting-modal');
+            if (modal) {
+                modal.classList.add('hidden');
+                modal.classList.remove('flex');
+            }
+        }
+
+        function saveDapurSettings() {
+            const minStock = document.getElementById('dapur-min-stock').value || '5';
+            const lowAlert = document.getElementById('dapur-low-alert').checked;
+            const defaultUnit = document.getElementById('dapur-default-unit').value;
+
+            localStorage.setItem('dapur_min_stock', minStock);
+            localStorage.setItem('dapur_low_alert', lowAlert);
+            localStorage.setItem('dapur_default_unit', defaultUnit);
+
+            closeDapurSettingModal();
+
+            const toast = document.getElementById('dapur-toast');
+            if (toast) {
+                toast.classList.remove('hidden');
+                setTimeout(() => toast.classList.add('hidden'), 3000);
+            }
         }
     </script>
 </body>
