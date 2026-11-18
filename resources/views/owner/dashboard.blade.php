@@ -50,7 +50,7 @@
                     <span>Dashboard</span>
                 </a>
 
-                <a href="#" onclick="alert('Halaman pengaturan toko segera hadir.')"
+                <a href="javascript:void(0)" onclick="openOwnerSettingModal()"
                    class="flex items-center gap-3 px-4 py-3 rounded-full text-gray-300 hover:text-white hover:bg-white/10 font-medium text-sm transition">
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
@@ -267,6 +267,92 @@
         </main>
     </div>
 
+    <!-- Modal Pengaturan Toko & Owner (kasir.in Theme) -->
+    <div id="owner-setting-modal" class="hidden fixed inset-0 z-50 bg-black/50 backdrop-blur-[2px] items-center justify-center p-4">
+        <div class="bg-white w-full max-w-md rounded-2xl shadow-2xl p-6 relative">
+            <!-- Header Modal -->
+            <div class="flex items-center justify-between border-b border-gray-100 pb-3.5 mb-4">
+                <div class="flex items-center gap-2.5">
+                    <div class="w-9 h-9 rounded-xl bg-red-50 text-[#D21F2B] flex items-center justify-center">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                        </svg>
+                    </div>
+                    <div>
+                        <h3 class="text-sm font-extrabold text-gray-900">Pengaturan Toko & Owner</h3>
+                        <p class="text-[11px] text-gray-500">Konfigurasi profil outlet & laporan eksekutif</p>
+                    </div>
+                </div>
+                <button type="button" onclick="closeOwnerSettingModal()" class="text-gray-400 hover:text-gray-700 text-xl font-bold leading-none">&times;</button>
+            </div>
+
+            <!-- Info Akun & Outlet -->
+            <div class="bg-gray-50 rounded-xl p-3.5 mb-4 border border-gray-100 text-xs space-y-1.5">
+                <div class="flex justify-between">
+                    <span class="text-gray-500">Pemilik / Owner</span>
+                    <span class="font-bold text-gray-900">{{ Auth::user()->name ?? 'Owner Kuah Kuwi' }}</span>
+                </div>
+                <div class="flex justify-between">
+                    <span class="text-gray-500">Nama Outlet</span>
+                    <span id="owner-outlet-label" class="font-bold text-[#D21F2B]">Kuah Kuwi • kasir.in</span>
+                </div>
+            </div>
+
+            <!-- Opsi Pengaturan Owner -->
+            <div class="space-y-3 mb-6">
+                <div class="p-3 rounded-xl border border-gray-200">
+                    <label class="block text-xs font-bold text-gray-800 mb-1">Nama Outlet / Cabang</label>
+                    <input type="text" id="owner-store-name" value="Kuah Kuwi"
+                        class="w-full text-xs font-semibold text-gray-800 border border-gray-300 rounded-lg px-3 py-1.5 focus:outline-none focus:border-[#D21F2B]">
+                </div>
+
+                <label class="flex items-center justify-between p-3 rounded-xl border border-gray-200 cursor-pointer hover:bg-gray-50 transition">
+                    <div>
+                        <p class="text-xs font-bold text-gray-800">Target Omzet Harian</p>
+                        <p class="text-[11px] text-gray-500">Acuan evaluasi performa penjualan</p>
+                    </div>
+                    <div class="flex items-center gap-1">
+                        <span class="text-xs font-bold text-gray-500">Rp</span>
+                        <input type="number" id="owner-daily-target" step="50000" min="0" value="1500000"
+                            class="w-28 text-right text-xs font-bold text-gray-800 border border-gray-300 rounded-lg px-2.5 py-1.5 focus:outline-none focus:border-[#D21F2B]">
+                    </div>
+                </label>
+
+                <label class="flex items-center justify-between p-3 rounded-xl border border-gray-200 cursor-pointer hover:bg-gray-50 transition">
+                    <div>
+                        <p class="text-xs font-bold text-gray-800">Periode Laporan Default</p>
+                        <p class="text-[11px] text-gray-500">Tampilan awal saat membuka Dashboard</p>
+                    </div>
+                    <select id="owner-default-period" class="text-xs font-bold text-gray-800 border border-gray-300 rounded-lg px-2.5 py-1.5 focus:outline-none focus:border-[#D21F2B]">
+                        <option value="today">Hari Ini</option>
+                        <option value="week">Minggu Ini</option>
+                        <option value="month">Bulan Ini</option>
+                    </select>
+                </label>
+            </div>
+
+            <!-- Tombol Aksi -->
+            <div class="flex justify-end gap-2.5">
+                <button type="button" onclick="closeOwnerSettingModal()" class="px-4 py-2 rounded-xl border border-gray-300 text-xs font-bold text-gray-700 hover:bg-gray-50 transition">
+                    Batal
+                </button>
+                <button type="button" onclick="saveOwnerSettings()" class="px-5 py-2 rounded-xl bg-[#D21F2B] hover:bg-[#b51924] text-white text-xs font-bold transition shadow-sm">
+                    Simpan Pengaturan
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast Notifikasi Owner -->
+    <div id="owner-toast" class="hidden fixed top-5 right-5 z-[60] bg-white border-l-4 border-emerald-500 shadow-xl rounded-xl px-4 py-3 flex items-center gap-3">
+        <div class="w-7 h-7 rounded-full bg-emerald-100 text-emerald-600 flex items-center justify-center font-bold text-xs">✓</div>
+        <div>
+            <p class="text-xs font-extrabold text-gray-900">Berhasil</p>
+            <p class="text-[11px] text-gray-600">Pengaturan toko & owner berhasil disimpan!</p>
+        </div>
+    </div>
+
     <script>
         const ctx = document.getElementById('salesChart').getContext('2d');
 
@@ -343,7 +429,46 @@
             }
         });
 
-         
+    function openOwnerSettingModal() {
+        const modal = document.getElementById('owner-setting-modal');
+        if (!modal) return;
+
+        document.getElementById('owner-store-name').value = localStorage.getItem('owner_store_name') || 'Kuah Kuwi';
+        document.getElementById('owner-daily-target').value = localStorage.getItem('owner_daily_target') || '1500000';
+        document.getElementById('owner-default-period').value = localStorage.getItem('owner_default_period') || 'today';
+
+        modal.classList.remove('hidden');
+        modal.classList.add('flex');
+    }
+
+    function closeOwnerSettingModal() {
+        const modal = document.getElementById('owner-setting-modal');
+        if (modal) {
+            modal.classList.add('hidden');
+            modal.classList.remove('flex');
+        }
+    }
+
+    function saveOwnerSettings() {
+        const storeName = document.getElementById('owner-store-name').value.trim() || 'Kuah Kuwi';
+        const dailyTarget = document.getElementById('owner-daily-target').value || '1500000';
+        const defaultPeriod = document.getElementById('owner-default-period').value;
+
+        localStorage.setItem('owner_store_name', storeName);
+        localStorage.setItem('owner_daily_target', dailyTarget);
+        localStorage.setItem('owner_default_period', defaultPeriod);
+
+        document.getElementById('owner-outlet-label').innerText = `${storeName} • kasir.in`;
+
+        closeOwnerSettingModal();
+
+        const toast = document.getElementById('owner-toast');
+        if (toast) {
+            toast.classList.remove('hidden');
+            setTimeout(() => toast.classList.add('hidden'), 3000);
+        }
+    } 
+        
     </script>
 </body>
 </html>
