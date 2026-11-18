@@ -345,12 +345,17 @@
     </div>
 
     <!-- Toast Notifikasi Owner -->
-    <div id="owner-toast" class="hidden fixed top-5 right-5 z-[60] bg-white border-l-4 border-emerald-500 shadow-xl rounded-xl px-4 py-3 flex items-center gap-3">
-        <div class="w-7 h-7 rounded-full bg-emerald-100 text-emerald-600 flex items-center justify-center font-bold text-xs">✓</div>
-        <div>
-            <p class="text-xs font-extrabold text-gray-900">Berhasil</p>
-            <p class="text-[11px] text-gray-600">Pengaturan toko & owner berhasil disimpan!</p>
-        </div>
+    <div id="owner-toast" class="hidden fixed top-4 left-1/2 -translate-x-1/2 z-[60] bg-white border-l-4 border-emerald-600 shadow-xl rounded-xl px-4 py-3 flex items-center gap-3 min-w-[300px]">
+    <div class="w-8 h-8 rounded-full bg-emerald-100 text-emerald-600 flex items-center justify-center shrink-0 font-bold text-sm">
+        ✓
+    </div>
+    <div class="flex-1">
+        <p class="text-xs font-extrabold text-gray-900">Berhasil</p>
+        <p class="text-[11px] text-gray-600">Pengaturan toko & owner berhasil disimpan!</p>
+    </div>
+    <button type="button" onclick="document.getElementById('owner-toast').classList.add('hidden')" class="text-gray-400 hover:text-gray-700 text-base font-bold leading-none ml-1">
+        &times;
+    </button>
     </div>
 
     <script>
