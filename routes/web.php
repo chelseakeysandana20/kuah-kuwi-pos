@@ -58,6 +58,7 @@ Route::middleware('auth')->group(function () {
         Route::post('/stok', [StokController::class, 'store'])->name('dapur.stok.store');
         Route::patch('/stok/{id}', [StokController::class, 'updateStock'])->name('dapur.stok.update');
         Route::get('/stok/export', [StokController::class, 'export'])->name('dapur.stok.export');
+        Route::get('/riwayat', [StokController::class, 'riwayat'])->name('dapur.riwayat');
         Route::get('/tutup-kasir/download', [PosController::class, 'downloadLaporanTutupKasir'])->name('kasir.tutup.download');
         Route::post('/tutup-kasir/konfirmasi', [PosController::class, 'konfirmasiTutupKasir'])->name('kasir.tutup.konfirmasi');
     });

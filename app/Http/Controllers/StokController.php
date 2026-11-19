@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\Ingredient;
+use App\Models\Transaction;
 
 class StokController extends Controller
 {
@@ -130,5 +131,58 @@ class StokController extends Controller
         };
 
         return response()->stream($callback, 200, $headers);
+    }
+
+    public function riwayat(Request $request)
+    {
+        $query = Transaction::with(['details.product'])
+            ->where('status', 'completed')
+            ->orderBy('created_at', 'desc');
+
+        // Filter pencarian nomor nota, meja/tipe, catatan, atau nama menu
+        if ($request->filled('search')) {
+            $keyword = $request->search;
+            $query->where(function ($q) use ($keyword) {
+                $q->where('receipt_number', 'like', "%{$keyword}%")
+                  ->orWhere('table_number', 'like', "%{$keyword}%")
+                  ->orWhere('note', 'like', "%{$keyword}%")
+                  ->orWhereHas('details.product', function ($pq) use ($keyword) {
+                      $pq->where('name', 'like', "%{$keyword}%");
+                  });
+            });
+        }
+
+        // Filter berdasarkan tanggal spesifik
+        if ($request->filled('date')) {
+            $query->whereDate('created_at', $request->date);
+        }
+
+        // Filter berdasarkan bulan (YYYY-MM)
+        if ($request->filled('month')) {
+            $parts = explode('-', $request->month);
+            if (count($parts) === 2) {
+                $query->whereYear('created_at', $parts[0])
+                      ->whereMonth('created_at', $parts[1]);
+            }
+        }
+
+        $riwayatDapur = $query->paginate(15)->withQueryString();
+
+        // Ringkasan KPI hari ini untuk staff dapur
+        $pesananHariIni = Transaction::where('status', 'completed')
+            ->whereDate('created_at', today())
+            ->count();
+
+        $totalPorsiHariIni = Transaction::where('status', 'completed')
+            ->whereDate('created_at', today())
+            ->withSum('details', 'quantity')
+            ->get()
+            ->sum('details_sum_quantity');
+
+        return view('dapur.riwayat', compact(
+            'riwayatDapur',
+            'pesananHariIni',
+            'totalPorsiHariIni'
+        ));
     }
 }
