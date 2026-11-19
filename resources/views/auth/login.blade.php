@@ -100,6 +100,20 @@
         </form>
     </div>
 
+    <!-- Splash Screen kasir.in -->
+    <div id="kasirin-splash" class="fixed inset-0 z-[9999] bg-[#D21F2B] flex items-center justify-center transition-opacity duration-700 ease-out">
+        <h1 id="splash-logo" class="text-white text-5xl md:text-6xl font-extrabold tracking-tight flex items-center select-none" aria-label="kasir.in">
+            <span class="splash-char opacity-0 translate-y-4 transition-all duration-300 ease-out">k</span>
+            <span class="splash-char opacity-0 translate-y-4 transition-all duration-300 ease-out">a</span>
+            <span class="splash-char opacity-0 translate-y-4 transition-all duration-300 ease-out">s</span>
+            <span class="splash-char opacity-0 translate-y-4 transition-all duration-300 ease-out">i</span>
+            <span class="splash-char opacity-0 translate-y-4 transition-all duration-300 ease-out">r</span>
+            <span class="splash-char opacity-0 translate-y-4 transition-all duration-300 ease-out">.</span>
+            <span class="splash-char opacity-0 translate-y-4 transition-all duration-300 ease-out">i</span>
+            <span class="splash-char opacity-0 translate-y-4 transition-all duration-300 ease-out">n</span>
+        </h1>
+    </div>
+
     <script>
         function toggleDropdown() {
             const menu = document.getElementById('dropdown-menu');
@@ -158,6 +172,31 @@
                 menu.classList.add('hidden');
                 document.getElementById('dropdown-arrow').classList.remove('rotate-180');
             }
+        });
+
+        document.addEventListener('DOMContentLoaded', () => {
+        const splash = document.getElementById('kasirin-splash');
+        const chars = document.querySelectorAll('.splash-char');
+
+        if (!splash || chars.length === 0) return;
+
+        // Munculkan huruf satu per satu dari 'k' sampai 'n'
+        chars.forEach((char, index) => {
+            setTimeout(() => {
+                char.classList.remove('opacity-0', 'translate-y-4');
+                char.classList.add('opacity-100', 'translate-y-0');
+            }, 180 + (index * 130)); // Jeda 130ms antar huruf
+        });
+
+        // Total waktu sampai huruf 'n' selesai muncul, lalu jeda sebentar sebelum masuk ke pilihan username
+        const totalAnimationTime = 180 + (chars.length * 130) + 550;
+
+        setTimeout(() => {
+            splash.classList.add('opacity-0', 'pointer-events-none');
+            setTimeout(() => {
+                splash.remove();
+            }, 700); // Hapus elemen setelah transisi fade-out selesai
+        }, totalAnimationTime);
         });
     </script>
 </body>
