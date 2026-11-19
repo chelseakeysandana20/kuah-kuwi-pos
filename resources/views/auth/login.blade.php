@@ -100,18 +100,36 @@
         </form>
     </div>
 
-    <!-- Splash Screen kasir.in -->
-    <div id="kasirin-splash" class="fixed inset-0 z-[9999] bg-[#D21F2B] flex items-center justify-center transition-opacity duration-700 ease-out">
-        <h1 id="splash-logo" class="text-white text-5xl md:text-6xl font-extrabold tracking-tight flex items-center select-none" aria-label="kasir.in">
-            <span class="splash-char opacity-0 translate-y-4 transition-all duration-300 ease-out">k</span>
-            <span class="splash-char opacity-0 translate-y-4 transition-all duration-300 ease-out">a</span>
-            <span class="splash-char opacity-0 translate-y-4 transition-all duration-300 ease-out">s</span>
-            <span class="splash-char opacity-0 translate-y-4 transition-all duration-300 ease-out">i</span>
-            <span class="splash-char opacity-0 translate-y-4 transition-all duration-300 ease-out">r</span>
-            <span class="splash-char opacity-0 translate-y-4 transition-all duration-300 ease-out">.</span>
-            <span class="splash-char opacity-0 translate-y-4 transition-all duration-300 ease-out">i</span>
-            <span class="splash-char opacity-0 translate-y-4 transition-all duration-300 ease-out">n</span>
-        </h1>
+    <!-- Splash Screen kasir.in (Ukuran Raksasa Seragam & Tanpa Delay) -->
+    <style>
+        @keyframes charPopUp {
+            0% {
+                opacity: 0;
+                transform: translateY(28px);
+            }
+            100% {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        .kasirin-splash-char {
+            display: inline-block;
+            opacity: 0;
+            animation: charPopUp 0.35s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+        }
+    </style>
+
+    <div id="kasirin-splash" style="background-color: #D21F2B;" class="fixed inset-0 z-[9999] flex items-center justify-center transition-opacity duration-500 ease-out">
+        <div style="font-size: clamp(4.5rem, 15vw, 13.5rem); color: #FAF7F2; letter-spacing: -0.03em;" class="font-extrabold leading-none flex items-center select-none">
+            <span class="kasirin-splash-char" style="animation-delay: 0.05s;">k</span>
+            <span class="kasirin-splash-char" style="animation-delay: 0.16s;">a</span>
+            <span class="kasirin-splash-char" style="animation-delay: 0.27s;">s</span>
+            <span class="kasirin-splash-char" style="animation-delay: 0.38s;">i</span>
+            <span class="kasirin-splash-char" style="animation-delay: 0.49s;">r</span>
+            <span class="kasirin-splash-char" style="animation-delay: 0.60s;">.</span>
+            <span class="kasirin-splash-char" style="animation-delay: 0.71s;">i</span>
+            <span class="kasirin-splash-char" style="animation-delay: 0.82s;">n</span>
+        </div>
     </div>
 
     <script>
@@ -174,30 +192,16 @@
             }
         });
 
-        document.addEventListener('DOMContentLoaded', () => {
-        const splash = document.getElementById('kasirin-splash');
-        const chars = document.querySelectorAll('.splash-char');
-
-        if (!splash || chars.length === 0) return;
-
-        // Munculkan huruf satu per satu dari 'k' sampai 'n'
-        chars.forEach((char, index) => {
-            setTimeout(() => {
-                char.classList.remove('opacity-0', 'translate-y-4');
-                char.classList.add('opacity-100', 'translate-y-0');
-            }, 180 + (index * 130)); // Jeda 130ms antar huruf
-        });
-
-        // Total waktu sampai huruf 'n' selesai muncul, lalu jeda sebentar sebelum masuk ke pilihan username
-        const totalAnimationTime = 180 + (chars.length * 130) + 550;
-
-        setTimeout(() => {
-            splash.classList.add('opacity-0', 'pointer-events-none');
-            setTimeout(() => {
-                splash.remove();
-            }, 700); // Hapus elemen setelah transisi fade-out selesai
-        }, totalAnimationTime);
-        });
+        setTimeout(function () {
+            var splash = document.getElementById('kasirin-splash');
+            if (splash) {
+                splash.style.opacity = '0';
+                splash.style.pointerEvents = 'none';
+                setTimeout(function () {
+                    splash.remove();
+                }, 500);
+            }
+        }, 1550);
     </script>
 </body>
 </html>
