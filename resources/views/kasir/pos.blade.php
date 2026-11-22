@@ -848,6 +848,81 @@
                 selectPayment(savedPay);
             }
         });
+
+        // === SINKRONISASI KERANJANG ANTAR KATEGORI ===
+        // === SINKRONISASI KERANJANG & FILTER KATEGORI TANPA RELOAD ===
+        const STORAGE_CART = 'kuahkuwi_pos_cart';
+        const STORAGE_TABLE = 'kuahkuwi_pos_table';
+        const STORAGE_NOTE = 'kuahkuwi_pos_note';
+
+        function clearCartStorage() {
+            localStorage.removeItem(STORAGE_CART);
+            localStorage.removeItem(STORAGE_TABLE);
+            localStorage.removeItem(STORAGE_NOTE);
+        }
+
+        // Pulihkan data pesanan saat halaman pertama kali dimuat
+        window.addEventListener('DOMContentLoaded', () => {
+            const savedCart = localStorage.getItem(STORAGE_CART);
+            if (savedCart) {
+                try {
+                    const parsed = JSON.parse(savedCart);
+                    if (Array.isArray(parsed) && parsed.length > 0) {
+                        cart = parsed;
+                        renderCart();
+                    }
+                } catch (e) {}
+            }
+
+            const tableEl = document.getElementById('table_number');
+            const noteEl = document.getElementById('order_note');
+
+            if (tableEl && localStorage.getItem(STORAGE_TABLE)) {
+                tableEl.value = localStorage.getItem(STORAGE_TABLE);
+            }
+            if (noteEl && localStorage.getItem(STORAGE_NOTE)) {
+                noteEl.value = localStorage.getItem(STORAGE_NOTE);
+            }
+
+            tableEl?.addEventListener('change', () => {
+                localStorage.setItem(STORAGE_TABLE, tableEl.value);
+            });
+            noteEl?.addEventListener('input', () => {
+                localStorage.setItem(STORAGE_NOTE, noteEl.value);
+            });
+        });
+
+        // Simpan otomatis setiap kali renderCart() dipanggil
+        const originalRenderCart = renderCart;
+        renderCart = function() {
+            originalRenderCart();
+            localStorage.setItem(STORAGE_CART, JSON.stringify(cart));
+        };
+
+        // Filter kategori langsung tanpa me-reload halaman (Detail pesanan tetap diam)
+        function filterCategory(categoryName, clickedBtn) {
+            // Update tampilan tombol tab yang aktif
+            document.querySelectorAll('.category-btn').forEach(btn => {
+                btn.classList.remove('bg-[#D21F2B]', 'text-white', 'border-[#D21F2B]');
+                btn.classList.add('bg-white', 'text-gray-700', 'border-gray-200');
+            });
+            if (clickedBtn) {
+                clickedBtn.classList.remove('bg-white', 'text-gray-700', 'border-gray-200');
+                clickedBtn.classList.add('bg-[#D21F2B]', 'text-white', 'border-[#D21F2B]');
+            }
+
+            // Tampilkan/sembunyikan kartu menu sesuai kategori
+            const keyword = categoryName.toLowerCase().trim();
+            const menuItems = document.querySelectorAll('.menu-item');
+            menuItems.forEach(item => {
+                const itemCat = (item.getAttribute('data-category') || '').toLowerCase().trim();
+                if (keyword === 'all' || keyword === 'semua' || itemCat === keyword) {
+                    item.classList.remove('hidden');
+                } else {
+                    item.classList.add('hidden');
+                }
+            });
+        }
     </script>
 </body>
 </html>
