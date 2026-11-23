@@ -902,29 +902,38 @@
             localStorage.setItem(STORAGE_CART, JSON.stringify(cart));
         };
 
-        // Filter kategori langsung tanpa me-reload halaman (Detail pesanan tetap diam)
-        function filterCategory(categoryName, clickedBtn) {
-            // Update tampilan tombol tab yang aktif
+        let activeCategoryId = '{{ $categoryId }}';
+
+        function filterCategory(catId, clickedBtn) {
+            activeCategoryId = String(catId);
+
+            // Reset semua tombol kategori ke transparan (teks putih pudar)
             document.querySelectorAll('.category-btn').forEach(btn => {
-                btn.classList.remove('bg-[#D21F2B]', 'text-white', 'border-[#D21F2B]');
-                btn.classList.add('bg-white', 'text-gray-700', 'border-gray-200');
+                btn.classList.remove('bg-[#D21F2B]', 'bg-white', 'text-white', 'text-gray-700', 'border-gray-200', 'border-[#D21F2B]', 'font-bold', 'shadow-lg', 'translate-x-1.5');
+                btn.classList.add('text-white/75', 'font-medium', 'hover:text-white', 'hover:bg-white/10');
             });
+
+            // Beri warna merah (#D21F2B) dan geser kanan pada tombol yang diklik
             if (clickedBtn) {
-                clickedBtn.classList.remove('bg-white', 'text-gray-700', 'border-gray-200');
-                clickedBtn.classList.add('bg-[#D21F2B]', 'text-white', 'border-[#D21F2B]');
+                clickedBtn.classList.remove('text-white/75', 'font-medium', 'hover:text-white', 'hover:bg-white/10', 'bg-white', 'text-gray-700', 'border-gray-200');
+                clickedBtn.classList.add('bg-[#D21F2B]', 'text-white', 'font-bold', 'shadow-lg', 'translate-x-1.5');
             }
 
-            // Tampilkan/sembunyikan kartu menu sesuai kategori
-            const keyword = categoryName.toLowerCase().trim();
+            // Reset kolom pencarian & tampilkan kartu menu sesuai kategori
+            const searchEl = document.getElementById('search-menu');
+            if (searchEl) searchEl.value = '';
+
             const menuItems = document.querySelectorAll('.menu-item');
             menuItems.forEach(item => {
-                const itemCat = (item.getAttribute('data-category') || '').toLowerCase().trim();
-                if (keyword === 'all' || keyword === 'semua' || itemCat === keyword) {
+                if (item.getAttribute('data-category') === activeCategoryId) {
                     item.classList.remove('hidden');
                 } else {
                     item.classList.add('hidden');
                 }
             });
+
+            const emptyMsg = document.getElementById('empty-search-msg');
+            if (emptyMsg) emptyMsg.classList.add('hidden');
         }
     </script>
 </body>
