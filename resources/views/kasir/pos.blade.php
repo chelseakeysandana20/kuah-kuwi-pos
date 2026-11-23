@@ -59,8 +59,10 @@
                             $isActive = ($categoryId == $cat->id);
                         @endphp
 
-                        <a href="{{ route('kasir.index', ['category_id' => $cat->id]) }}" 
-                           class="flex items-center gap-3 px-4 py-3 rounded-full cursor-pointer transition-all duration-200 {{ $isActive ? 'bg-[#D21F2B] text-white font-bold shadow-lg translate-x-1.5' : 'text-white/75 font-medium hover:text-white hover:bg-white/10' }}">
+                        <button type="button"
+                                onclick="filterCategory('{{ $cat->id }}', this)"
+                                data-cat-id="{{ $cat->id }}"
+                                class="category-btn w-full text-left flex items-center gap-3 px-4 py-3 rounded-full cursor-pointer transition-all duration-200 {{ $isActive ? 'bg-[#D21F2B] text-white font-bold shadow-lg translate-x-1.5' : 'text-white/75 font-medium hover:text-white hover:bg-white/10' }}">
                             
                             @if (strtolower($cat->name) == 'noodle')
                                 <svg class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -77,7 +79,7 @@
                             @endif
 
                             <span class="text-sm">{{ $cat->name }}</span>
-                        </a>
+                        </button>
                     @endforeach
                 </div>
 
@@ -126,7 +128,8 @@
                         @foreach ($products as $product)
                             <div onclick="addToCart({{ $product->id }}, '{{ addslashes($product->name) }}', {{ $product->price }})"
                                 data-name="{{ strtolower($product->name) }}"
-                                class="menu-item bg-white p-5 rounded-2xl shadow-sm border border-gray-100 hover:border-[#D21F2B] hover:shadow-md cursor-pointer transition group flex flex-col justify-between">
+                                data-category="{{ $product->category_id }}"
+                                class="menu-item {{ $product->category_id != $categoryId ? 'hidden' : '' }} bg-white p-5 rounded-2xl shadow-sm border border-gray-100 hover:border-[#D21F2B] hover:shadow-md cursor-pointer transition group flex flex-col justify-between">
                                 <h3 class="font-bold text-base text-gray-800 group-hover:text-[#D21F2B] transition leading-snug">{{ $product->name }}</h3>
                                 <p class="text-sm font-bold text-[#D21F2B] mt-3">
                                     {{ $product->price == 0 ? 'Gratis' : 'Rp ' . number_format($product->price, 0, ',', '.') }}

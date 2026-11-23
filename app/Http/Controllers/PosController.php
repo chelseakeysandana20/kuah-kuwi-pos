@@ -21,49 +21,36 @@ class PosController extends Controller
     // Mengambil semua kategori untuk ditampilkan di sidebar
     $categories = Category::all();
 
-    // Cek apakah ada filter kategori yang diklik (mengambil ID kategori dari URL)
-    $categoryId = $request->get('category_id');
+    // Tentukan kategori aktif awal (default kategori pertama, misal: Noodle)
+    $defaultCategory = $categories->first();
+    $categoryId = $request->get('category_id') ?? ($defaultCategory ? $defaultCategory->id : null);
 
-    // Jika kategori dipilih, filter produk berdasarkan category_id tersebut
-    if ($categoryId) {
-        $products = Product::with('category')
-            ->where('is_available', 1)
-            ->where('category_id', $categoryId)
-            ->get();
-    } else {
-        // Default: Jika belum ada yang diklik, ambil kategori pertama (misal: Noodle)
-        $defaultCategory = $categories->first();
-        $categoryId = $defaultCategory ? $defaultCategory->id : null;
-
-        $products = Product::with('category')
-            ->where('is_available', 1)
-            ->when($categoryId, function($query, $categoryId) {
-                return $query->where('category_id', $categoryId);
-            })
-            ->get();
-    }
+    // Ambil semua produk yang tersedia (is_available = 1) agar pindah tab tanpa reload halaman
+    $products = Product::with('category')
+        ->where('is_available', 1)
+        ->get();
 
     // Hitung Rekap Penjualan Hari Ini untuk Modal Tutup Kasir
-        $today = Carbon::today();
-        $amountCol = Schema::hasColumn('transactions', 'total_amount') ? 'total_amount'
-                   : (Schema::hasColumn('transactions', 'total_price') ? 'total_price' : 'total');
+    $today = Carbon::today();
+    $amountCol = Schema::hasColumn('transactions', 'total_amount') ? 'total_amount'
+               : (Schema::hasColumn('transactions', 'total_price') ? 'total_price' : 'total');
 
-        $todayTransactions = DB::table('transactions')
-            ->whereDate('created_at', $today)
-            ->where('status', '!=', 'open')
-            ->get();
+    $todayTransactions = DB::table('transactions')
+        ->whereDate('created_at', $today)
+        ->where('status', '!=', 'open')
+        ->get();
 
-        $rekapHariIni = [
-            'report_id'       => 'RPT' . $today->format('dmY'),
-            'tanggal'         => $today->translatedFormat('d F Y'),
-            'total_transaksi' => $todayTransactions->count(),
-            'total_income'    => $todayTransactions->sum($amountCol),
-            'total_cash'      => $todayTransactions->filter(fn($t) => strtolower($t->payment_method ?? '') === 'cash')->sum($amountCol),
-            'total_qris'      => $todayTransactions->filter(fn($t) => strtolower($t->payment_method ?? '') === 'qris')->sum($amountCol),
-        ];
+    $rekapHariIni = [
+        'report_id'       => 'RPT' . $today->format('dmY'),
+        'tanggal'         => $today->translatedFormat('d F Y'),
+        'total_transaksi' => $todayTransactions->count(),
+        'total_income'    => $todayTransactions->sum($amountCol),
+        'total_cash'      => $todayTransactions->filter(fn($t) => strtolower($t->payment_method ?? '') === 'cash')->sum($amountCol),
+        'total_qris'      => $todayTransactions->filter(fn($t) => strtolower($t->payment_method ?? '') === 'qris')->sum($amountCol),
+    ];
 
     // Mengirim data ke view kasir/pos.blade.php
-    return view('kasir.pos', compact('categories', 'products', 'categoryId'));
+    return view('kasir.pos', compact('categories', 'products', 'categoryId', 'rekapHariIni'));
     }
 
     // Fungsi baru untuk memproses pembayaran dan menyimpan ke database
