@@ -866,25 +866,33 @@
 
         // Pulihkan data pesanan saat halaman pertama kali dimuat
         window.addEventListener('DOMContentLoaded', () => {
+            const tableEl = document.getElementById('table_number');
+            const noteEl = document.getElementById('order_note');
             const savedCart = localStorage.getItem(STORAGE_CART);
+            let hasItems = false;
+
             if (savedCart) {
                 try {
                     const parsed = JSON.parse(savedCart);
                     if (Array.isArray(parsed) && parsed.length > 0) {
                         cart = parsed;
+                        hasItems = true;
                         renderCart();
                     }
                 } catch (e) {}
             }
 
-            const tableEl = document.getElementById('table_number');
-            const noteEl = document.getElementById('order_note');
-
-            if (tableEl && localStorage.getItem(STORAGE_TABLE)) {
-                tableEl.value = localStorage.getItem(STORAGE_TABLE);
-            }
-            if (noteEl && localStorage.getItem(STORAGE_NOTE)) {
-                noteEl.value = localStorage.getItem(STORAGE_NOTE);
+            if (hasItems) {
+                if (tableEl && localStorage.getItem(STORAGE_TABLE)) {
+                    tableEl.value = localStorage.getItem(STORAGE_TABLE);
+                }
+                if (noteEl && localStorage.getItem(STORAGE_NOTE)) {
+                    noteEl.value = localStorage.getItem(STORAGE_NOTE);
+                }
+            } else {
+                clearCartStorage();
+                if (tableEl) tableEl.value = '';
+                if (noteEl) noteEl.value = '';
             }
 
             tableEl?.addEventListener('change', () => {
